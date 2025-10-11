@@ -19,35 +19,35 @@ final class PetDataManager: PetDataManagerProtocol {
     }
 
     func fetchAll() throws -> [Pet] {
-        let context = coreDataStack.viewContext
-        let request = PetEntity.fetchRequest()
+        let context = try coreDataStack.viewContext
+        let request = NSFetchRequest<NSManagedObject>(entityName: "PetEntity")
         request.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: true)]
 
         let entities = try context.fetch(request)
-        return entities.compactMap { $0.toDomain() }
+        return entities.compactMap { toDomain(from: $0) }
     }
 
     func fetch(by id: UUID) throws -> Pet? {
-        let context = coreDataStack.viewContext
-        let request = PetEntity.fetchRequest()
+        let context = try coreDataStack.viewContext
+        let request = NSFetchRequest<NSManagedObject>(entityName: "PetEntity")
         request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
         request.fetchLimit = 1
 
         let entities = try context.fetch(request)
-        return entities.first?.toDomain()
+        return entities.first.flatMap { toDomain(from: $0) }
     }
 
     func create(_ pet: Pet) throws {
-        let context = coreDataStack.viewContext
-        let entity = PetEntity(context: context)
-        entity.update(from: pet)
+        let context = try coreDataStack.viewContext
+        let entity = NSEntityDescription.insertNewObject(forEntityName: "PetEntity", into: context)
+        update(entity: entity, from: pet)
 
         try coreDataStack.saveContext()
     }
 
     func update(_ pet: Pet) throws {
-        let context = coreDataStack.viewContext
-        let request = PetEntity.fetchRequest()
+        let context = try coreDataStack.viewContext
+        let request = NSFetchRequest<NSManagedObject>(entityName: "PetEntity")
         request.predicate = NSPredicate(format: "id == %@", pet.id as CVarArg)
         request.fetchLimit = 1
 
@@ -55,13 +55,13 @@ final class PetDataManager: PetDataManagerProtocol {
             throw PetWidgetError.invalidData
         }
 
-        entity.update(from: pet)
+        update(entity: entity, from: pet)
         try coreDataStack.saveContext()
     }
 
     func delete(_ pet: Pet) throws {
-        let context = coreDataStack.viewContext
-        let request = PetEntity.fetchRequest()
+        let context = try coreDataStack.viewContext
+        let request = NSFetchRequest<NSManagedObject>(entityName: "PetEntity")
         request.predicate = NSPredicate(format: "id == %@", pet.id as CVarArg)
         request.fetchLimit = 1
 
@@ -72,20 +72,20 @@ final class PetDataManager: PetDataManagerProtocol {
         context.delete(entity)
         try coreDataStack.saveContext()
     }
-}
 
-// MARK: - PetEntity Extensions
-extension PetEntity {
-    func toDomain() -> Pet? {
-        guard let id = id,
-              let name = name,
-              let birthDate = birthDate,
-              let speciesString = species,
+    // MARK: - Private Helpers
+
+    private func toDomain(from entity: NSManagedObject) -> Pet? {
+        guard let id = entity.value(forKey: "id") as? UUID,
+              let name = entity.value(forKey: "name") as? String,
+              let birthDate = entity.value(forKey: "birthDate") as? Date,
+              let speciesString = entity.value(forKey: "species") as? String,
               let species = PetType(rawValue: speciesString),
-              let createdAt = createdAt,
-              let updatedAt = updatedAt else {
+              let _ = entity.value(forKey: "createdAt") as? Date else {
             return nil
         }
+
+        let photoData = entity.value(forKey: "photoData") as? Data
 
         return Pet(
             id: id,
@@ -96,13 +96,13 @@ extension PetEntity {
         )
     }
 
-    func update(from pet: Pet) {
-        self.id = pet.id
-        self.name = pet.name
-        self.birthDate = pet.birthDate
-        self.species = pet.species.rawValue
-        self.photoData = pet.photoData
-        self.createdAt = pet.createdAt
-        self.updatedAt = Date()
+    private func update(entity: NSManagedObject, from pet: Pet) {
+        entity.setValue(pet.id, forKey: "id")
+        entity.setValue(pet.name, forKey: "name")
+        entity.setValue(pet.birthDate, forKey: "birthDate")
+        entity.setValue(pet.species.rawValue, forKey: "species")
+        entity.setValue(pet.photoData, forKey: "photoData")
+        entity.setValue(pet.createdAt, forKey: "createdAt")
+        entity.setValue(Date(), forKey: "updatedAt")
     }
 }

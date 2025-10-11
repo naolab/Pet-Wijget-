@@ -10,6 +10,36 @@
 		359FEA782E9963AC002E7549 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 359FEA772E9963AC002E7549 /* WidgetKit.framework */; };
 		359FEA7A2E9963AC002E7549 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 359FEA792E9963AC002E7549 /* SwiftUI.framework */; };
 		359FEA892E9963B1002E7549 /* PetWidgetExtensionExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 359FEA752E9963AB002E7549 /* PetWidgetExtensionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		35C50EA32E9A024D004121B1 /* DateFormatter+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C50E9E2E9A024D004121B1 /* DateFormatter+Extensions.swift */; };
+		35C50EA42E9A024D004121B1 /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C50E902E9A024D004121B1 /* CoreDataStack.swift */; };
+		35C50EA52E9A024D004121B1 /* HumanAgeConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C50E9F2E9A024D004121B1 /* HumanAgeConverter.swift */; };
+		35C50EA62E9A024D004121B1 /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C50E9D2E9A024D004121B1 /* AppConfig.swift */; };
+		35C50EA72E9A024D004121B1 /* PetWidgetError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C50E942E9A024D004121B1 /* PetWidgetError.swift */; };
+		35C50EA82E9A024D004121B1 /* PetDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C50E912E9A024D004121B1 /* PetDataManager.swift */; };
+		35C50EA92E9A024D004121B1 /* WidgetSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C50E9A2E9A024D004121B1 /* WidgetSettings.swift */; };
+		35C50EAA2E9A024D004121B1 /* PhotoManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C50EA02E9A024D004121B1 /* PhotoManager.swift */; };
+		35C50EAB2E9A024D004121B1 /* PetType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C50E982E9A024D004121B1 /* PetType.swift */; };
+		35C50EAC2E9A024D004121B1 /* ThemeSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C50E992E9A024D004121B1 /* ThemeSettings.swift */; };
+		35C50EAD2E9A024D004121B1 /* AgeCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C50E9C2E9A024D004121B1 /* AgeCalculator.swift */; };
+		35C50EAE2E9A024D004121B1 /* SettingsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C50E922E9A024D004121B1 /* SettingsManager.swift */; };
+		35C50EAF2E9A024D004121B1 /* Pet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C50E972E9A024D004121B1 /* Pet.swift */; };
+		35C50EB02E9A024D004121B1 /* DisplaySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C50E962E9A024D004121B1 /* DisplaySettings.swift */; };
+		35C50EB12E9A024D004121B1 /* DateFormatter+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C50E9E2E9A024D004121B1 /* DateFormatter+Extensions.swift */; };
+		35C50EB22E9A024D004121B1 /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C50E902E9A024D004121B1 /* CoreDataStack.swift */; };
+		35C50EB32E9A024D004121B1 /* HumanAgeConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C50E9F2E9A024D004121B1 /* HumanAgeConverter.swift */; };
+		35C50EB42E9A024D004121B1 /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C50E9D2E9A024D004121B1 /* AppConfig.swift */; };
+		35C50EB52E9A024D004121B1 /* PetWidgetError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C50E942E9A024D004121B1 /* PetWidgetError.swift */; };
+		35C50EB62E9A024D004121B1 /* PetDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C50E912E9A024D004121B1 /* PetDataManager.swift */; };
+		35C50EB72E9A024D004121B1 /* WidgetSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C50E9A2E9A024D004121B1 /* WidgetSettings.swift */; };
+		35C50EB82E9A024D004121B1 /* PhotoManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C50EA02E9A024D004121B1 /* PhotoManager.swift */; };
+		35C50EB92E9A024D004121B1 /* PetType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C50E982E9A024D004121B1 /* PetType.swift */; };
+		35C50EBA2E9A024D004121B1 /* ThemeSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C50E992E9A024D004121B1 /* ThemeSettings.swift */; };
+		35C50EBB2E9A024D004121B1 /* AgeCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C50E9C2E9A024D004121B1 /* AgeCalculator.swift */; };
+		35C50EBC2E9A024D004121B1 /* SettingsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C50E922E9A024D004121B1 /* SettingsManager.swift */; };
+		35C50EBD2E9A024D004121B1 /* Pet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C50E972E9A024D004121B1 /* Pet.swift */; };
+		35C50EBE2E9A024D004121B1 /* DisplaySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C50E962E9A024D004121B1 /* DisplaySettings.swift */; };
+		35C50EC12E9A6D32004121B1 /* PetWidget.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 35C50EBF2E9A6D32004121B1 /* PetWidget.xcdatamodeld */; };
+		35C50EC22E9A6D32004121B1 /* PetWidget.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 35C50EBF2E9A6D32004121B1 /* PetWidget.xcdatamodeld */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -58,6 +88,21 @@
 		359FEA772E9963AC002E7549 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		359FEA792E9963AC002E7549 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		359FEA8F2E996549002E7549 /* PetWidgetExtensionExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PetWidgetExtensionExtension.entitlements; sourceTree = "<group>"; };
+		35C50E902E9A024D004121B1 /* CoreDataStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataStack.swift; sourceTree = "<group>"; };
+		35C50E912E9A024D004121B1 /* PetDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetDataManager.swift; sourceTree = "<group>"; };
+		35C50E922E9A024D004121B1 /* SettingsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsManager.swift; sourceTree = "<group>"; };
+		35C50E942E9A024D004121B1 /* PetWidgetError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetWidgetError.swift; sourceTree = "<group>"; };
+		35C50E962E9A024D004121B1 /* DisplaySettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplaySettings.swift; sourceTree = "<group>"; };
+		35C50E972E9A024D004121B1 /* Pet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pet.swift; sourceTree = "<group>"; };
+		35C50E982E9A024D004121B1 /* PetType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PetType.swift; sourceTree = "<group>"; };
+		35C50E992E9A024D004121B1 /* ThemeSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeSettings.swift; sourceTree = "<group>"; };
+		35C50E9A2E9A024D004121B1 /* WidgetSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSettings.swift; sourceTree = "<group>"; };
+		35C50E9C2E9A024D004121B1 /* AgeCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgeCalculator.swift; sourceTree = "<group>"; };
+		35C50E9D2E9A024D004121B1 /* AppConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfig.swift; sourceTree = "<group>"; };
+		35C50E9E2E9A024D004121B1 /* DateFormatter+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DateFormatter+Extensions.swift"; sourceTree = "<group>"; };
+		35C50E9F2E9A024D004121B1 /* HumanAgeConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HumanAgeConverter.swift; sourceTree = "<group>"; };
+		35C50EA02E9A024D004121B1 /* PhotoManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoManager.swift; sourceTree = "<group>"; };
+		35C50EC02E9A6D32004121B1 /* PetWidget.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = PetWidget.xcdatamodel; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -143,6 +188,8 @@
 		359FEA362E99634C002E7549 = {
 			isa = PBXGroup;
 			children = (
+				35C50EBF2E9A6D32004121B1 /* PetWidget.xcdatamodeld */,
+				35C50EA22E9A024D004121B1 /* Shared */,
 				359FEA8F2E996549002E7549 /* PetWidgetExtensionExtension.entitlements */,
 				359FEA412E99634C002E7549 /* PetWidget */,
 				359FEA562E99634E002E7549 /* PetWidgetTests */,
@@ -171,6 +218,59 @@
 				359FEA792E9963AC002E7549 /* SwiftUI.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		35C50E932E9A024D004121B1 /* DataManager */ = {
+			isa = PBXGroup;
+			children = (
+				35C50E902E9A024D004121B1 /* CoreDataStack.swift */,
+				35C50E912E9A024D004121B1 /* PetDataManager.swift */,
+				35C50E922E9A024D004121B1 /* SettingsManager.swift */,
+			);
+			path = DataManager;
+			sourceTree = "<group>";
+		};
+		35C50E952E9A024D004121B1 /* Errors */ = {
+			isa = PBXGroup;
+			children = (
+				35C50E942E9A024D004121B1 /* PetWidgetError.swift */,
+			);
+			path = Errors;
+			sourceTree = "<group>";
+		};
+		35C50E9B2E9A024D004121B1 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				35C50E962E9A024D004121B1 /* DisplaySettings.swift */,
+				35C50E972E9A024D004121B1 /* Pet.swift */,
+				35C50E982E9A024D004121B1 /* PetType.swift */,
+				35C50E992E9A024D004121B1 /* ThemeSettings.swift */,
+				35C50E9A2E9A024D004121B1 /* WidgetSettings.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		35C50EA12E9A024D004121B1 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				35C50E9C2E9A024D004121B1 /* AgeCalculator.swift */,
+				35C50E9D2E9A024D004121B1 /* AppConfig.swift */,
+				35C50E9E2E9A024D004121B1 /* DateFormatter+Extensions.swift */,
+				35C50E9F2E9A024D004121B1 /* HumanAgeConverter.swift */,
+				35C50EA02E9A024D004121B1 /* PhotoManager.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		35C50EA22E9A024D004121B1 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				35C50E932E9A024D004121B1 /* DataManager */,
+				35C50E952E9A024D004121B1 /* Errors */,
+				35C50E9B2E9A024D004121B1 /* Models */,
+				35C50EA12E9A024D004121B1 /* Utilities */,
+			);
+			path = Shared;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -352,6 +452,21 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				35C50EA32E9A024D004121B1 /* DateFormatter+Extensions.swift in Sources */,
+				35C50EA42E9A024D004121B1 /* CoreDataStack.swift in Sources */,
+				35C50EA52E9A024D004121B1 /* HumanAgeConverter.swift in Sources */,
+				35C50EA62E9A024D004121B1 /* AppConfig.swift in Sources */,
+				35C50EC22E9A6D32004121B1 /* PetWidget.xcdatamodeld in Sources */,
+				35C50EA72E9A024D004121B1 /* PetWidgetError.swift in Sources */,
+				35C50EA82E9A024D004121B1 /* PetDataManager.swift in Sources */,
+				35C50EA92E9A024D004121B1 /* WidgetSettings.swift in Sources */,
+				35C50EAA2E9A024D004121B1 /* PhotoManager.swift in Sources */,
+				35C50EAB2E9A024D004121B1 /* PetType.swift in Sources */,
+				35C50EAC2E9A024D004121B1 /* ThemeSettings.swift in Sources */,
+				35C50EAD2E9A024D004121B1 /* AgeCalculator.swift in Sources */,
+				35C50EAE2E9A024D004121B1 /* SettingsManager.swift in Sources */,
+				35C50EAF2E9A024D004121B1 /* Pet.swift in Sources */,
+				35C50EB02E9A024D004121B1 /* DisplaySettings.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -373,6 +488,21 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				35C50EB12E9A024D004121B1 /* DateFormatter+Extensions.swift in Sources */,
+				35C50EB22E9A024D004121B1 /* CoreDataStack.swift in Sources */,
+				35C50EB32E9A024D004121B1 /* HumanAgeConverter.swift in Sources */,
+				35C50EB42E9A024D004121B1 /* AppConfig.swift in Sources */,
+				35C50EB52E9A024D004121B1 /* PetWidgetError.swift in Sources */,
+				35C50EB62E9A024D004121B1 /* PetDataManager.swift in Sources */,
+				35C50EB72E9A024D004121B1 /* WidgetSettings.swift in Sources */,
+				35C50EB82E9A024D004121B1 /* PhotoManager.swift in Sources */,
+				35C50EB92E9A024D004121B1 /* PetType.swift in Sources */,
+				35C50EC12E9A6D32004121B1 /* PetWidget.xcdatamodeld in Sources */,
+				35C50EBA2E9A024D004121B1 /* ThemeSettings.swift in Sources */,
+				35C50EBB2E9A024D004121B1 /* AgeCalculator.swift in Sources */,
+				35C50EBC2E9A024D004121B1 /* SettingsManager.swift in Sources */,
+				35C50EBD2E9A024D004121B1 /* Pet.swift in Sources */,
+				35C50EBE2E9A024D004121B1 /* DisplaySettings.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -781,6 +911,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		35C50EBF2E9A6D32004121B1 /* PetWidget.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				35C50EC02E9A6D32004121B1 /* PetWidget.xcdatamodel */,
+			);
+			currentVersion = 35C50EC02E9A6D32004121B1 /* PetWidget.xcdatamodel */;
+			path = PetWidget/PetWidget.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 359FEA372E99634C002E7549 /* Project object */;
 }

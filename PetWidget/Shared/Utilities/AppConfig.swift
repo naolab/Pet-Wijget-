@@ -1,7 +1,7 @@
 import Foundation
 
 enum AppConfig {
-    static let appGroupID = "group.com.yourcompany.petwidget"
+    static let appGroupID = "group.com.nao.petwidget"
     static let widgetKind = "PetWidget"
 
     // 画像設定
