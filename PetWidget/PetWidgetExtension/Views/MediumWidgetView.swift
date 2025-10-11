@@ -15,28 +15,7 @@ struct MediumWidgetView: View {
     private func petContentView(pet: Pet) -> some View {
         HStack(spacing: 16) {
             // 左側: ペット写真
-            VStack {
-                if let photoData = pet.photoData,
-                   let uiImage = UIImage(data: photoData),
-                   let resizedData = PhotoManager.shared.processImageForWidget(uiImage),
-                   let resizedImage = UIImage(data: resizedData) {
-                    Image(uiImage: resizedImage)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: 120, height: 120)
-                        .clipShape(Circle())
-                } else {
-                    ZStack {
-                        Circle()
-                            .fill(Color.gray.opacity(0.2))
-                            .frame(width: 120, height: 120)
-
-                        Image(systemName: "pawprint.fill")
-                            .font(.system(size: 50))
-                            .foregroundColor(.gray)
-                    }
-                }
-            }
+            petPhotoView(photoData: pet.photoData)
 
             // 右側: 時刻・ペット情報
             VStack(alignment: .leading, spacing: 8) {
@@ -78,6 +57,38 @@ struct MediumWidgetView: View {
         .padding()
     }
 
+    private func petPhotoView(photoData: Data?) -> some View {
+        Group {
+            if let photoData = photoData,
+               let processedImage = processPhotoForWidget(photoData) {
+                Image(uiImage: processedImage)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 120, height: 120)
+                    .clipShape(Circle())
+            } else {
+                ZStack {
+                    Circle()
+                        .fill(Color.gray.opacity(0.2))
+                        .frame(width: 120, height: 120)
+
+                    Image(systemName: "pawprint.fill")
+                        .font(.system(size: 50))
+                        .foregroundColor(.gray)
+                }
+            }
+        }
+    }
+
+    private func processPhotoForWidget(_ photoData: Data) -> UIImage? {
+        guard let uiImage = UIImage(data: photoData),
+              let resizedData = PhotoManager.shared.processImageForWidget(uiImage),
+              let resizedImage = UIImage(data: resizedData) else {
+            return nil
+        }
+        return resizedImage
+    }
+
     private var emptyStateView: some View {
         VStack(spacing: 12) {
             Image(systemName: "pawprint.fill")
@@ -95,11 +106,6 @@ struct MediumWidgetView: View {
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
             }
-
-            // デバッグ情報
-            Text("Date: \(entry.date, style: .time)")
-                .font(.system(size: 8))
-                .foregroundColor(.gray)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }

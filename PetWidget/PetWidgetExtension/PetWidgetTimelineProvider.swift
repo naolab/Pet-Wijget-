@@ -61,19 +61,27 @@ struct PetWidgetTimelineProvider: TimelineProvider {
 
     private func createEntry(for date: Date) -> PetWidgetEntry {
         do {
+            #if DEBUG
             print("🔄 Widget: Attempting to fetch pets...")
+            #endif
             let pets = try dataManager.fetchAll()
+            #if DEBUG
             print("✅ Widget: Fetched \(pets.count) pets")
+            #endif
 
             if let firstPet = pets.first {
+                #if DEBUG
                 print("✅ Widget: Displaying pet: \(firstPet.name)")
+                #endif
                 return PetWidgetEntry(
                     date: date,
                     pet: firstPet,
                     errorMessage: nil
                 )
             } else {
+                #if DEBUG
                 print("⚠️ Widget: No pets found")
+                #endif
                 return PetWidgetEntry(
                     date: date,
                     pet: nil,
@@ -81,7 +89,9 @@ struct PetWidgetTimelineProvider: TimelineProvider {
                 )
             }
         } catch {
+            #if DEBUG
             print("❌ Widget: Failed to fetch pets: \(error)")
+            #endif
             return PetWidgetEntry(
                 date: date,
                 pet: nil,

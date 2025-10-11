@@ -38,8 +38,8 @@
 		35C50EBC2E9A024D004121B1 /* SettingsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C50E922E9A024D004121B1 /* SettingsManager.swift */; };
 		35C50EBD2E9A024D004121B1 /* Pet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C50E972E9A024D004121B1 /* Pet.swift */; };
 		35C50EBE2E9A024D004121B1 /* DisplaySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C50E962E9A024D004121B1 /* DisplaySettings.swift */; };
-		35C50EC12E9A6D32004121B1 /* PetWidget.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 35C50EBF2E9A6D32004121B1 /* PetWidget.xcdatamodeld */; };
-		35C50EC22E9A6D32004121B1 /* PetWidget.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 35C50EBF2E9A6D32004121B1 /* PetWidget.xcdatamodeld */; };
+		35C50EC12E9A6D32004121B1 /* PetWidget/PetWidget.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 35C50EBF2E9A6D32004121B1 /* PetWidget/PetWidget.xcdatamodeld */; };
+		35C50EC22E9A6D32004121B1 /* PetWidget/PetWidget.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 35C50EBF2E9A6D32004121B1 /* PetWidget/PetWidget.xcdatamodeld */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -188,7 +188,7 @@
 		359FEA362E99634C002E7549 = {
 			isa = PBXGroup;
 			children = (
-				35C50EBF2E9A6D32004121B1 /* PetWidget.xcdatamodeld */,
+				35C50EBF2E9A6D32004121B1 /* PetWidget/PetWidget.xcdatamodeld */,
 				35C50EA22E9A024D004121B1 /* Shared */,
 				359FEA8F2E996549002E7549 /* PetWidgetExtensionExtension.entitlements */,
 				359FEA412E99634C002E7549 /* PetWidget */,
@@ -456,7 +456,7 @@
 				35C50EA42E9A024D004121B1 /* CoreDataStack.swift in Sources */,
 				35C50EA52E9A024D004121B1 /* HumanAgeConverter.swift in Sources */,
 				35C50EA62E9A024D004121B1 /* AppConfig.swift in Sources */,
-				35C50EC22E9A6D32004121B1 /* PetWidget.xcdatamodeld in Sources */,
+				35C50EC22E9A6D32004121B1 /* PetWidget/PetWidget.xcdatamodeld in Sources */,
 				35C50EA72E9A024D004121B1 /* PetWidgetError.swift in Sources */,
 				35C50EA82E9A024D004121B1 /* PetDataManager.swift in Sources */,
 				35C50EA92E9A024D004121B1 /* WidgetSettings.swift in Sources */,
@@ -497,7 +497,7 @@
 				35C50EB72E9A024D004121B1 /* WidgetSettings.swift in Sources */,
 				35C50EB82E9A024D004121B1 /* PhotoManager.swift in Sources */,
 				35C50EB92E9A024D004121B1 /* PetType.swift in Sources */,
-				35C50EC12E9A6D32004121B1 /* PetWidget.xcdatamodeld in Sources */,
+				35C50EC12E9A6D32004121B1 /* PetWidget/PetWidget.xcdatamodeld in Sources */,
 				35C50EBA2E9A024D004121B1 /* ThemeSettings.swift in Sources */,
 				35C50EBB2E9A024D004121B1 /* AgeCalculator.swift in Sources */,
 				35C50EBC2E9A024D004121B1 /* SettingsManager.swift in Sources */,
@@ -913,7 +913,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCVersionGroup section */
-		35C50EBF2E9A6D32004121B1 /* PetWidget.xcdatamodeld */ = {
+		35C50EBF2E9A6D32004121B1 /* PetWidget/PetWidget.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
 				35C50EC02E9A6D32004121B1 /* PetWidget.xcdatamodel */,
