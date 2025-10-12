@@ -82,19 +82,38 @@
   - エラーハンドリング
   - プレビュー対応
 
-#### 📱 Widget Views
-- [x] `MediumWidgetView.swift` - Mediumサイズウィジェット
+#### 📱 Widget Views（全サイズ対応）
+- [x] `SmallWidgetView.swift` - Smallサイズウィジェット (134行)
+  - 時計メイン表示（28pt、Rounded Design）
+  - ペット写真小（50×50px円形）
+  - ペット名コンパクト表示
+  - グラデーション背景
+  - Empty State対応
+
+- [x] `MediumWidgetView.swift` - Mediumサイズウィジェット (155行)
   - 時刻・日付表示（リアルタイム更新）
-  - ペット写真（円形表示）
+  - ペット写真（120×120px円形表示）
   - ペット名・アイコン
   - 年齢表示（◯歳◯ヶ月）
   - 人間換算年齢表示
   - Empty State対応
   - エラーメッセージ表示
 
+- [x] `LargeWidgetView.swift` - Largeサイズウィジェット (238行)
+  - 大きな時計・日付表示（48pt）
+  - 曜日表示追加
+  - 詳細なペット情報レイアウト
+  - 誕生日表示（アイコン付き）
+  - 角丸四角の写真フレーム（140×140px）
+  - アイコン付き情報表示
+  - Empty State対応
+
 #### ⚙️ Configuration
 - [x] `PetWidgetExtension.swift` - ウィジェット定義
-  - Medium サイズ対応
+  - Small/Medium/Large 全サイズ対応 ✅
+  - `@main`属性設定
+  - `@Environment(\.widgetFamily)`によるサイズ判定
+  - `WidgetContentView`による切り替えロジック
   - 1分間隔更新
 
 ### 6. コードベースのクリーンアップ ✅
@@ -132,10 +151,14 @@
 - [x] アイコン付き情報表示（年齢・人間換算年齢）
 - [x] Empty State対応
 
-#### ウィジェット定義の更新
+#### ウィジェット定義の更新とバグ修正
 - [x] `.supportedFamilies`に`.systemSmall`と`.systemLarge`追加
 - [x] `WidgetContentView`を追加してサイズ切り替え実装
 - [x] `@Environment(\.widgetFamily)`でサイズ判定
+- [x] `@main`属性追加（Extension読み込み問題を修正）
+- [x] `EXExtensionContextClass not defined`エラー解決
+- [x] シミュレータでの動作確認完了
+- [x] feature/widget-size-supportブランチをmainにマージ完了
 
 ---
 
@@ -245,12 +268,14 @@ Pet-Wijget-/
 │   │       └── PetListViewModel.swift - 一覧画面ロジック
 │   │
 │   ├── PetWidgetExtension/           (Widget) ✅
-│   │   ├── PetWidgetExtension.swift - ウィジェット定義
+│   │   ├── PetWidgetExtension.swift - ウィジェット定義（全サイズ対応）
 │   │   ├── PetWidgetTimelineProvider.swift - タイムライン生成
 │   │   ├── Assets.xcassets
 │   │   ├── Info.plist
 │   │   └── Views/
-│   │       └── MediumWidgetView.swift - Mediumサイズビュー
+│   │       ├── SmallWidgetView.swift  - Smallサイズビュー (134行)
+│   │       ├── MediumWidgetView.swift - Mediumサイズビュー (155行)
+│   │       └── LargeWidgetView.swift  - Largeサイズビュー (238行)
 │   │
 │   └── Shared/                       ✅ 共有モジュール
 │       ├── Models/                   - データモデル (5ファイル)
@@ -317,7 +342,7 @@ Pet-Wijget-/
 | **コードクオリティ** | ██████████ 100% ✅ |
 | **Phase 1 全体** | ██████████ 100% ✅ |
 | **Phase 2 ウィジェットサイズ** | ██████████ 100% ✅ |
-| **Phase 2 全体** | ████░░░░░░ 40% 🔄 |
+| **Phase 2 全体** | █████░░░░░ 50% 🔄 |
 
 ---
 
@@ -370,15 +395,23 @@ Pet-Wijget-/
 
 ### Git管理状況
 - **メインブランチ**: `main`
-- **最新コミット**: `307c0a8` (Merge branch 'refactor/cleanup-and-improve')
-- **総コミット数**: 6コミット
+- **最新コミット**: `4e5a61d` (docs: Phase 2ウィジェットサイズ拡張完了を記録)
+- **直近のマージ**: `7a50df8` (Merge branch 'feature/widget-size-support')
+- **総コミット数**: 10コミット
+- **アクティブブランチ**:
+  - `main` (最新)
+  - `feature/widget-size-support` (マージ済み)
+  - `refactor/cleanup-and-improve` (マージ済み)
 - **リモート**: https://github.com/naolab/Pet-Wijget-.git
 
 ### 実装統計
-- **総ファイル数**: 20+ファイル
-- **コード行数**: ~1,500行（推定）
-- **削減した行数**: 214行（リファクタリング）
-- **追加した行数**: 91行（リファクタリング）
+- **総ファイル数**: 28ファイル (+8ファイル from Phase 1)
+- **コード行数**: ~2,000行（Phase 1: 1,500行 + Phase 2: 500行）
+- **Phase 2追加コード**: +446行
+  - SmallWidgetView.swift: 134行
+  - LargeWidgetView.swift: 238行
+  - PetWidgetExtension.swift修正: +25行
+  - PROGRESS.md更新: +72行
 
 ### Phase 1 完了成果物
 1. ✅ 動作するiOSアプリ（ペット登録・一覧・削除）
@@ -387,3 +420,11 @@ Pet-Wijget-/
 4. ✅ 写真選択・リサイズ機能
 5. ✅ 年齢計算・人間換算年齢表示
 6. ✅ クリーンなコードベース
+
+### Phase 2 ウィジェットサイズ拡張 完了成果物
+1. ✅ Smallサイズウィジェット（コンパクト表示）
+2. ✅ Largeサイズウィジェット（詳細情報表示）
+3. ✅ 3サイズ完全対応（Small/Medium/Large）
+4. ✅ サイズ別最適化レイアウト
+5. ✅ Extension読み込みバグ修正
+6. ✅ シミュレータ動作確認済み
