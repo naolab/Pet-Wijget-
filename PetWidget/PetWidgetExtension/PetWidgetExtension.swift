@@ -8,23 +8,42 @@
 import WidgetKit
 import SwiftUI
 
+@main
 struct PetWidgetExtension: Widget {
     let kind: String = "PetWidgetExtension"
 
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: PetWidgetTimelineProvider()) { entry in
             if #available(iOS 17.0, *) {
-                MediumWidgetView(entry: entry)
+                WidgetContentView(entry: entry)
                     .containerBackground(.fill.tertiary, for: .widget)
             } else {
-                MediumWidgetView(entry: entry)
+                WidgetContentView(entry: entry)
                     .padding()
                     .background()
             }
         }
         .configurationDisplayName("ペットウィジェット")
         .description("ペットの写真と時刻を表示します")
-        .supportedFamilies([.systemMedium])
+        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
+    }
+}
+
+struct WidgetContentView: View {
+    let entry: PetWidgetEntry
+    @Environment(\.widgetFamily) var widgetFamily
+
+    var body: some View {
+        switch widgetFamily {
+        case .systemSmall:
+            SmallWidgetView(entry: entry)
+        case .systemMedium:
+            MediumWidgetView(entry: entry)
+        case .systemLarge:
+            LargeWidgetView(entry: entry)
+        default:
+            MediumWidgetView(entry: entry)
+        }
     }
 }
 
