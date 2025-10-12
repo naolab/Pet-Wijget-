@@ -8,6 +8,7 @@
 import WidgetKit
 import SwiftUI
 
+@main
 struct PetWidgetExtension: Widget {
     let kind: String = "PetWidgetExtension"
 
