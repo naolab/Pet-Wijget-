@@ -5,6 +5,7 @@ struct PetWidgetEntry: TimelineEntry {
     let date: Date
     let pet: Pet?
     let errorMessage: String?
+    let settings: WidgetSettings
 
     var isValid: Bool {
         pet != nil && errorMessage == nil
@@ -13,12 +14,14 @@ struct PetWidgetEntry: TimelineEntry {
 
 struct PetWidgetTimelineProvider: TimelineProvider {
     private let dataManager = PetDataManager.shared
+    private let settingsManager = SettingsManager.shared
 
     func placeholder(in context: Context) -> PetWidgetEntry {
         PetWidgetEntry(
             date: Date(),
             pet: createSamplePet(),
-            errorMessage: nil
+            errorMessage: nil,
+            settings: .default
         )
     }
 
@@ -29,7 +32,8 @@ struct PetWidgetTimelineProvider: TimelineProvider {
             entry = PetWidgetEntry(
                 date: Date(),
                 pet: createSamplePet(),
-                errorMessage: nil
+                errorMessage: nil,
+                settings: .default
             )
         } else {
             entry = createEntry(for: Date())
@@ -60,6 +64,17 @@ struct PetWidgetTimelineProvider: TimelineProvider {
     }
 
     private func createEntry(for date: Date) -> PetWidgetEntry {
+        // 設定を読み込み
+        let settings: WidgetSettings
+        do {
+            settings = try settingsManager.loadWidgetSettings()
+        } catch {
+            #if DEBUG
+            print("⚠️ Widget: Failed to load settings, using defaults: \(error)")
+            #endif
+            settings = .default
+        }
+
         do {
             #if DEBUG
             print("🔄 Widget: Attempting to fetch pets...")
@@ -69,14 +84,24 @@ struct PetWidgetTimelineProvider: TimelineProvider {
             print("✅ Widget: Fetched \(pets.count) pets")
             #endif
 
-            if let firstPet = pets.first {
+            // 設定で指定されたペットを取得、なければ最初のペット
+            var selectedPet: Pet?
+            if let selectedID = settings.selectedPetID {
+                selectedPet = pets.first(where: { $0.id == selectedID })
+            }
+            if selectedPet == nil {
+                selectedPet = pets.first
+            }
+
+            if let pet = selectedPet {
                 #if DEBUG
-                print("✅ Widget: Displaying pet: \(firstPet.name)")
+                print("✅ Widget: Displaying pet: \(pet.name)")
                 #endif
                 return PetWidgetEntry(
                     date: date,
-                    pet: firstPet,
-                    errorMessage: nil
+                    pet: pet,
+                    errorMessage: nil,
+                    settings: settings
                 )
             } else {
                 #if DEBUG
@@ -85,7 +110,8 @@ struct PetWidgetTimelineProvider: TimelineProvider {
                 return PetWidgetEntry(
                     date: date,
                     pet: nil,
-                    errorMessage: "ペットが登録されていません"
+                    errorMessage: "ペットが登録されていません",
+                    settings: settings
                 )
             }
         } catch {
@@ -95,7 +121,8 @@ struct PetWidgetTimelineProvider: TimelineProvider {
             return PetWidgetEntry(
                 date: date,
                 pet: nil,
-                errorMessage: "データの読み込みに失敗しました: \(error.localizedDescription)"
+                errorMessage: "データの読み込みに失敗しました: \(error.localizedDescription)",
+                settings: settings
             )
         }
     }

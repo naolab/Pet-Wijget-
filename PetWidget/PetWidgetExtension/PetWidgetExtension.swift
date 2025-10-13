@@ -57,6 +57,6 @@ struct WidgetContentView: View {
         photoData: nil
     )
 
-    PetWidgetEntry(date: .now, pet: samplePet, errorMessage: nil)
-    PetWidgetEntry(date: .now, pet: nil, errorMessage: "ペットが登録されていません")
+    PetWidgetEntry(date: .now, pet: samplePet, errorMessage: nil, settings: .default)
+    PetWidgetEntry(date: .now, pet: nil, errorMessage: "ペットが登録されていません", settings: .default)
 }
