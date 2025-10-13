@@ -1,12 +1,20 @@
 import CoreData
 import Foundation
 
+enum PetSortOption {
+    case displayOrder   // カスタム並び順
+    case name           // 名前順
+    case birthDate      // 誕生日順（古い順）
+    case species        // 種別順
+}
+
 protocol PetDataManagerProtocol {
-    func fetchAll() throws -> [Pet]
+    func fetchAll(sortBy: PetSortOption) throws -> [Pet]
     func fetch(by id: UUID) throws -> Pet?
     func create(_ pet: Pet) throws
     func update(_ pet: Pet) throws
     func delete(_ pet: Pet) throws
+    func updateDisplayOrders(_ pets: [Pet]) throws
 }
 
 final class PetDataManager: PetDataManagerProtocol {
@@ -18,10 +26,24 @@ final class PetDataManager: PetDataManagerProtocol {
         self.coreDataStack = CoreDataStack.shared
     }
 
-    func fetchAll() throws -> [Pet] {
+    func fetchAll(sortBy: PetSortOption = .displayOrder) throws -> [Pet] {
         let context = try coreDataStack.viewContext
         let request = NSFetchRequest<NSManagedObject>(entityName: "PetEntity")
-        request.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: true)]
+
+        // ソート条件を設定
+        switch sortBy {
+        case .displayOrder:
+            request.sortDescriptors = [NSSortDescriptor(key: "displayOrder", ascending: true)]
+        case .name:
+            request.sortDescriptors = [NSSortDescriptor(key: "name", ascending: true)]
+        case .birthDate:
+            request.sortDescriptors = [NSSortDescriptor(key: "birthDate", ascending: true)]
+        case .species:
+            request.sortDescriptors = [
+                NSSortDescriptor(key: "species", ascending: true),
+                NSSortDescriptor(key: "name", ascending: true)
+            ]
+        }
 
         let entities = try context.fetch(request)
         return entities.compactMap { toDomain(from: $0) }
@@ -73,6 +95,22 @@ final class PetDataManager: PetDataManagerProtocol {
         try coreDataStack.saveContext()
     }
 
+    func updateDisplayOrders(_ pets: [Pet]) throws {
+        let context = try coreDataStack.viewContext
+
+        for (index, pet) in pets.enumerated() {
+            let request = NSFetchRequest<NSManagedObject>(entityName: "PetEntity")
+            request.predicate = NSPredicate(format: "id == %@", pet.id as CVarArg)
+            request.fetchLimit = 1
+
+            if let entity = try context.fetch(request).first {
+                entity.setValue(index, forKey: "displayOrder")
+            }
+        }
+
+        try coreDataStack.saveContext()
+    }
+
     // MARK: - Private Helpers
 
     private func toDomain(from entity: NSManagedObject) -> Pet? {
@@ -81,19 +119,26 @@ final class PetDataManager: PetDataManagerProtocol {
               let birthDate = entity.value(forKey: "birthDate") as? Date,
               let speciesString = entity.value(forKey: "species") as? String,
               let species = PetType(rawValue: speciesString),
-              let _ = entity.value(forKey: "createdAt") as? Date else {
+              let createdAt = entity.value(forKey: "createdAt") as? Date else {
             return nil
         }
 
         let photoData = entity.value(forKey: "photoData") as? Data
+        let displayOrder = entity.value(forKey: "displayOrder") as? Int ?? 0
+        let updatedAt = entity.value(forKey: "updatedAt") as? Date ?? createdAt
 
-        return Pet(
+        var pet = Pet(
             id: id,
             name: name,
             birthDate: birthDate,
             species: species,
-            photoData: photoData
+            photoData: photoData,
+            displayOrder: displayOrder
         )
+        pet.createdAt = createdAt
+        pet.updatedAt = updatedAt
+
+        return pet
     }
 
     private func update(entity: NSManagedObject, from pet: Pet) {
@@ -104,5 +149,6 @@ final class PetDataManager: PetDataManagerProtocol {
         entity.setValue(pet.photoData, forKey: "photoData")
         entity.setValue(pet.createdAt, forKey: "createdAt")
         entity.setValue(Date(), forKey: "updatedAt")
+        entity.setValue(pet.displayOrder, forKey: "displayOrder")
     }
 }

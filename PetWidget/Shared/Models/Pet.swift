@@ -8,13 +8,15 @@ struct Pet: Identifiable, Codable, Equatable {
     var photoData: Data?
     var createdAt: Date
     var updatedAt: Date
+    var displayOrder: Int
 
     init(
         id: UUID = UUID(),
         name: String,
         birthDate: Date,
         species: PetType,
-        photoData: Data? = nil
+        photoData: Data? = nil,
+        displayOrder: Int = 0
     ) {
         self.id = id
         self.name = name
@@ -23,6 +25,7 @@ struct Pet: Identifiable, Codable, Equatable {
         self.photoData = photoData
         self.createdAt = Date()
         self.updatedAt = Date()
+        self.displayOrder = displayOrder
     }
 
     // 年齢計算(年単位)
