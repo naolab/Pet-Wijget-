@@ -13,59 +13,107 @@ struct MediumWidgetView: View {
     }
 
     private func petContentView(pet: Pet) -> some View {
-        HStack(spacing: 16) {
-            // 左側: ペット写真
-            petPhotoView(photoData: pet.photoData)
+        let settings = entry.settings
+        let displaySettings = settings.displaySettings
+        let themeSettings = settings.themeSettings
 
-            // 右側: 時刻・ペット情報
-            VStack(alignment: .leading, spacing: 8) {
-                // 現在時刻
-                Text(entry.date, style: .time)
-                    .font(.system(size: 32, weight: .bold))
-                    .foregroundColor(.primary)
+        return ZStack {
+            // 背景
+            backgroundView(themeSettings: themeSettings)
 
-                // 日付
-                Text(formattedDate(entry.date))
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+            HStack(spacing: 16) {
+                // 左側: ペット写真
+                petPhotoView(photoData: pet.photoData, frameType: themeSettings.photoFrameType)
 
-                Divider()
-                    .padding(.vertical, 4)
+                // 右側: 時刻・ペット情報
+                VStack(alignment: .leading, spacing: 8) {
+                    // 現在時刻
+                    if displaySettings.showTime {
+                        Text(entry.date, style: .time)
+                            .font(.system(size: CGFloat(displaySettings.timeFontSize), weight: .bold))
+                            .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor))
+                    }
 
-                // ペット名
-                HStack(spacing: 4) {
-                    Image(systemName: speciesIcon(pet.species))
-                        .foregroundColor(.secondary)
-                    Text(pet.name)
-                        .font(.headline)
+                    // 日付
+                    if displaySettings.showDate {
+                        Text(formattedDate(entry.date, format: displaySettings.dateFormat))
+                            .font(.system(size: CGFloat(displaySettings.dateFontSize)))
+                            .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.7))
+                    }
+
+                    Divider()
+                        .padding(.vertical, 4)
+
+                    // ペット名
+                    if displaySettings.showName {
+                        HStack(spacing: 4) {
+                            Image(systemName: speciesIcon(pet.species))
+                                .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.7))
+                            Text(pet.name)
+                                .font(.system(size: CGFloat(displaySettings.nameFontSize), weight: .semibold))
+                                .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor))
+                        }
+                    }
+
+                    // 年齢情報
+                    VStack(alignment: .leading, spacing: 2) {
+                        if displaySettings.showAge {
+                            Text(ageText(pet))
+                                .font(.system(size: CGFloat(displaySettings.ageFontSize)))
+                                .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.7))
+                        }
+
+                        if displaySettings.showHumanAge {
+                            Text("人間だと \(pet.humanAge)歳")
+                                .font(.system(size: CGFloat(displaySettings.ageFontSize * 0.9)))
+                                .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.7))
+                        }
+                    }
                 }
 
-                // 年齢情報
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(ageText(pet))
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-
-                    Text("人間だと \(pet.humanAge)歳")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
+                Spacer()
             }
-
-            Spacer()
+            .padding()
         }
-        .padding()
     }
 
-    private func petPhotoView(photoData: Data?) -> some View {
+    private func backgroundView(themeSettings: ThemeSettings) -> some View {
+        Group {
+            switch themeSettings.backgroundType {
+            case .color:
+                ColorHelper.hexColor(themeSettings.backgroundColor)
+            case .gradient:
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        ColorHelper.hexColor(themeSettings.backgroundColor).opacity(0.3),
+                        ColorHelper.hexColor(themeSettings.backgroundColor).opacity(0.1)
+                    ]),
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            case .image:
+                ColorHelper.hexColor(themeSettings.backgroundColor)
+            }
+        }
+    }
+
+    private func petPhotoView(photoData: Data?, frameType: PhotoFrameType) -> some View {
         Group {
             if let photoData = photoData,
                let processedImage = processPhotoForWidget(photoData) {
-                Image(uiImage: processedImage)
+                let image = Image(uiImage: processedImage)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 120, height: 120)
-                    .clipShape(Circle())
+
+                switch frameType {
+                case .circle:
+                    image.clipShape(Circle())
+                case .roundedRect:
+                    image.clipShape(RoundedRectangle(cornerRadius: 16))
+                case .none:
+                    image
+                }
             } else {
                 ZStack {
                     Circle()
@@ -110,9 +158,9 @@ struct MediumWidgetView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
-    private func formattedDate(_ date: Date) -> String {
+    private func formattedDate(_ date: Date, format: DateFormatType) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "M月d日(E)"
+        formatter.dateFormat = format.rawValue
         formatter.locale = Locale(identifier: "ja_JP")
         return formatter.string(from: date)
     }
@@ -150,6 +198,6 @@ struct MediumWidgetView: View {
         photoData: nil
     )
 
-    PetWidgetEntry(date: .now, pet: samplePet, errorMessage: nil)
-    PetWidgetEntry(date: .now, pet: nil, errorMessage: "ペットが登録されていません")
+    PetWidgetEntry(date: .now, pet: samplePet, errorMessage: nil, settings: .default)
+    PetWidgetEntry(date: .now, pet: nil, errorMessage: "ペットが登録されていません", settings: .default)
 }

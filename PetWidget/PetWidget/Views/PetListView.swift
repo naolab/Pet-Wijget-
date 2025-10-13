@@ -4,6 +4,7 @@ struct PetListView: View {
     @StateObject private var viewModel = PetListViewModel()
     @State private var showingAddPet = false
     @State private var selectedPet: Pet?
+    @State private var showingSettings = false
 
     var body: some View {
         NavigationView {
@@ -18,6 +19,11 @@ struct PetListView: View {
             }
             .navigationTitle("ペット一覧")
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: { showingSettings = true }) {
+                        Image(systemName: "gear")
+                    }
+                }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { showingAddPet = true }) {
                         Image(systemName: "plus")
@@ -35,6 +41,9 @@ struct PetListView: View {
                     viewModel.updatePet(updatedPet)
                     selectedPet = nil
                 })
+            }
+            .sheet(isPresented: $showingSettings) {
+                SettingsView()
             }
             .alert("エラー", isPresented: .constant(viewModel.errorMessage != nil)) {
                 Button("OK") {
