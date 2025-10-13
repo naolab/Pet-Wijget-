@@ -2,46 +2,36 @@ import SwiftUI
 
 struct SettingsView: View {
     @StateObject private var viewModel = SettingsViewModel()
-    @Environment(\.dismiss) var dismiss
 
     var body: some View {
-        NavigationView {
-            Form {
-                // ペット選択セクション
-                petSelectionSection
+        Form {
+            // ペット選択セクション
+            petSelectionSection
 
-                // 表示項目セクション
-                displayItemsSection
+            // 表示項目セクション
+            displayItemsSection
 
-                // フォントサイズセクション
-                fontSizeSection
+            // フォントサイズセクション
+            fontSizeSection
 
-                // 日付・時刻フォーマットセクション
-                dateTimeFormatSection
+            // 日付・時刻フォーマットセクション
+            dateTimeFormatSection
 
-                // テーマ設定セクション
-                themeSection
+            // テーマ設定セクション
+            themeSection
 
-                // リセットセクション
-                resetSection
+            // リセットセクション
+            resetSection
+        }
+        .navigationTitle("ウィジェット設定")
+        .navigationBarTitleDisplayMode(.inline)
+        .alert("エラー", isPresented: .constant(viewModel.errorMessage != nil)) {
+            Button("OK") {
+                viewModel.errorMessage = nil
             }
-            .navigationTitle("ウィジェット設定")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("完了") {
-                        dismiss()
-                    }
-                }
-            }
-            .alert("エラー", isPresented: .constant(viewModel.errorMessage != nil)) {
-                Button("OK") {
-                    viewModel.errorMessage = nil
-                }
-            } message: {
-                if let errorMessage = viewModel.errorMessage {
-                    Text(errorMessage)
-                }
+        } message: {
+            if let errorMessage = viewModel.errorMessage {
+                Text(errorMessage)
             }
         }
     }
@@ -228,5 +218,7 @@ struct SettingsView: View {
 }
 
 #Preview {
-    SettingsView()
+    NavigationView {
+        SettingsView()
+    }
 }
