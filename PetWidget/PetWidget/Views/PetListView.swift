@@ -5,6 +5,7 @@ struct PetListView: View {
     @State private var showingAddPet = false
     @State private var selectedPet: Pet?
     @State private var showingSettings = false
+    @State private var editMode: EditMode = .inactive
 
     var body: some View {
         NavigationView {
@@ -18,15 +19,50 @@ struct PetListView: View {
                 }
             }
             .navigationTitle("ペット一覧")
+            .environment(\.editMode, $editMode)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: { showingSettings = true }) {
                         Image(systemName: "gear")
                     }
                 }
+
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: { showingAddPet = true }) {
-                        Image(systemName: "plus")
+                    HStack(spacing: 16) {
+                        // ソートメニュー
+                        Menu {
+                            Picker("並び順", selection: $viewModel.currentSortOption) {
+                                Label("カスタム", systemImage: "hand.draw").tag(PetSortOption.displayOrder)
+                                Label("名前順", systemImage: "textformat").tag(PetSortOption.name)
+                                Label("誕生日順", systemImage: "calendar").tag(PetSortOption.birthDate)
+                                Label("種別順", systemImage: "pawprint").tag(PetSortOption.species)
+                            }
+                            .onChange(of: viewModel.currentSortOption) { _, newValue in
+                                viewModel.changeSortOption(newValue)
+                            }
+                        } label: {
+                            Image(systemName: "arrow.up.arrow.down")
+                        }
+
+                        // 編集ボタン（カスタム順の時のみ表示）
+                        if viewModel.currentSortOption == .displayOrder {
+                            Button(action: {
+                                withAnimation {
+                                    if editMode == .active {
+                                        editMode = .inactive
+                                    } else {
+                                        editMode = .active
+                                    }
+                                }
+                            }) {
+                                Text(editMode == .active ? "完了" : "編集")
+                            }
+                        }
+
+                        // 追加ボタン
+                        Button(action: { showingAddPet = true }) {
+                            Image(systemName: "plus")
+                        }
                     }
                 }
             }
@@ -80,22 +116,48 @@ struct PetListView: View {
         }
     }
 
+    @ViewBuilder
     private var petListContent: some View {
-        List {
-            ForEach(viewModel.pets) { pet in
-                PetRowView(pet: pet)
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        selectedPet = pet
-                    }
+        if viewModel.currentSortOption == .displayOrder {
+            List {
+                ForEach(viewModel.pets) { pet in
+                    petRow(for: pet)
+                }
+                .onDelete(perform: viewModel.deletePets)
+                .onMove(perform: viewModel.movePets)
             }
-            .onDelete(perform: viewModel.deletePets)
+        } else {
+            List {
+                ForEach(viewModel.pets) { pet in
+                    petRow(for: pet)
+                }
+                .onDelete(perform: viewModel.deletePets)
+            }
         }
+    }
+
+    private func petRow(for pet: Pet) -> some View {
+        PetRowView(pet: pet, isEditing: editMode == .active)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                if editMode == .inactive {
+                    selectedPet = pet
+                }
+            }
+            .contextMenu {
+                Button(action: { selectedPet = pet }) {
+                    Label("編集", systemImage: "pencil")
+                }
+                Button(role: .destructive, action: { viewModel.deletePet(pet) }) {
+                    Label("削除", systemImage: "trash")
+                }
+            }
     }
 }
 
 struct PetRowView: View {
     let pet: Pet
+    var isEditing: Bool = false
 
     var body: some View {
         HStack(spacing: 16) {
@@ -119,6 +181,13 @@ struct PetRowView: View {
             }
 
             Spacer()
+
+            // 編集モードでない時は編集アイコンを表示
+            if !isEditing {
+                Image(systemName: "chevron.right")
+                    .foregroundColor(.secondary)
+                    .font(.caption)
+            }
         }
         .padding(.vertical, 8)
     }
