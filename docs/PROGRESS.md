@@ -1,7 +1,7 @@
 # 🚀 PetWidget 開発進捗レポート
 
-**最終更新**: 2025-10-12
-**現在のフェーズ**: Phase 2 - カスタマイズ機能拡張 🔄 **進行中** (ウィジェットサイズ拡張完了)
+**最終更新**: 2025-10-13
+**現在のフェーズ**: Phase 2 - カスタマイズ機能拡張 ✅ **完了**
 
 ---
 
@@ -160,41 +160,88 @@
 - [x] シミュレータでの動作確認完了
 - [x] feature/widget-size-supportブランチをmainにマージ完了
 
+### 8. ウィジェットカスタマイズ機能実装 (Phase 2) ✅
+
+#### 設定画面実装 (SettingsView.swift - 232行)
+- [x] ペット選択機能
+  - ウィジェットに表示するペットを個別選択
+  - 「最初のペット」または特定ペットを選択可能
+- [x] 表示項目の切り替え
+  - ペット名表示ON/OFF
+  - 年齢表示ON/OFF
+  - 人間換算年齢表示ON/OFF
+  - 時刻表示ON/OFF
+  - 日付表示ON/OFF
+- [x] フォントサイズ調整
+  - 名前: 10-24pt（スライダー調整）
+  - 年齢: 10-20pt
+  - 時刻: 20-48pt
+  - 日付: 10-16pt
+- [x] 日付・時刻フォーマット設定
+  - 日付フォーマット選択（和暦/西暦/月日/曜日）
+  - 24時間表示/12時間表示切り替え
+- [x] テーマ設定
+  - 背景タイプ選択（単色/グラデーション）
+  - 背景色カスタマイズ（ColorPicker）
+  - 文字色カスタマイズ（ColorPicker）
+  - 写真フレームタイプ選択（円形/角丸四角/四角）
+- [x] 設定リセット機能
+
+#### カラーヘルパー実装 (ColorHelper.swift / ColorExtensions.swift)
+- [x] Hex文字列 ⇄ Color変換機能
+- [x] Main App用ColorHelper（UIColor変換対応）
+- [x] Widget Extension用ColorHelper（軽量実装）
+- [x] プリセットカラー定義（16色）
+
+#### 設定管理ViewModel (SettingsViewModel.swift - 146行)
+- [x] 設定の読み込み・保存
+- [x] リアルタイムウィジェット更新（WidgetCenter.reloadAllTimelines）
+- [x] エラーハンドリング
+- [x] ペット一覧取得
+- [x] 各種設定更新メソッド
+
+#### 全ウィジェットへの設定適用
+- [x] SmallWidgetView - 設定反映
+- [x] MediumWidgetView - 設定反映
+- [x] LargeWidgetView - 設定反映
+- [x] PetWidgetTimelineProvider - 設定読み込み対応
+- [x] PetListView - 設定画面への導線追加（歯車アイコン）
+
+#### ビルド・動作確認
+- [x] ビルド成功確認
+- [x] 設定画面動作確認
+- [x] ウィジェットへの設定反映確認
+- [x] feature/widget-customizationブランチをmainにマージ完了
+
 ---
 
-## 🔄 次回作業予定（Phase 2）
+## 🔄 次回作業予定（Phase 3以降）
 
-### Phase 2: カスタマイズ機能拡張
+### Phase 3: UI/UX改善・拡張機能
 
-#### 優先度 HIGH: ウィジェットサイズ対応 ✅ **完了**
-- [x] **Smallサイズウィジェット実装**
-  - コンパクトな時計 + ペット名表示
-  - グラデーション背景
+#### 優先度 HIGH: UI/UX改善
+- [ ] **ペット編集機能**
+  - 登録済みペットの情報編集
+  - 削除せずに更新可能に
 
-- [x] **Largeサイズウィジェット実装**
-  - 詳細な情報表示
-  - 誕生日表示追加
-  - 角丸四角フレーム
-  - ※複数ペット対応は次のフェーズで検討
+- [ ] **写真のトリミング機能**
+  - 写真選択時のトリミング・ズーム
+  - より自由な写真配置
 
-#### 優先度 MEDIUM: 表示カスタマイズ
-- [ ] **レイアウト編集機能**
-  - 時計位置の変更（上/下/左/右）
-  - 情報表示項目の選択
-  - フォントサイズ調整
+- [ ] **ペットのソート・並び替え**
+  - 一覧画面でのドラッグ&ドロップ
+  - 表示順のカスタマイズ
 
-- [ ] **テーマ設定機能**
-  - カラーテーマ選択
-  - ダークモード対応
-  - カスタムカラー設定
+#### 優先度 MEDIUM: レイアウト高度化
+- [ ] **時計位置の変更機能**
+  - 上/下/左/右への配置変更
+  - より柔軟なレイアウト
 
-#### 優先度 LOW: UI/UX改善
-- [ ] **アプリ側UI改善**
-  - ペット編集機能
-  - 写真のトリミング機能
-  - ペットのソート・並び替え
+- [ ] **ダークモード対応**
+  - システム設定に追従
+  - 自動切り替え機能
 
-### Phase 3: 拡張機能（将来実装）
+#### 優先度 LOW: 拡張機能
 
 #### 多頭飼い対応
 - [ ] 複数ペット管理機能強化
@@ -227,12 +274,13 @@
 - [x] 年齢計算ロジック検証
 - [x] コードベースのリファクタリング
 
-### Phase 2: カスタマイズ機能
+### Phase 2: カスタマイズ機能 ✅ **完了**
 - [x] Smallサイズウィジェット ✅
 - [x] Largeサイズウィジェット ✅
-- [ ] レイアウト編集機能
-- [ ] テーマ設定機能
-- [ ] UI/UX改善
+- [x] 表示項目カスタマイズ機能 ✅
+- [x] フォントサイズ調整機能 ✅
+- [x] テーマ設定機能 ✅
+- [x] ペット選択機能 ✅
 
 ### Phase 3: 拡張機能（将来実装）
 - [ ] 多頭飼い対応強化
@@ -260,22 +308,27 @@ Pet-Wijget-/
 │   │   ├── Assets.xcassets
 │   │   ├── Info.plist
 │   │   ├── Views/
-│   │   │   ├── PetListView.swift    - ペット一覧画面
+│   │   │   ├── PetListView.swift    - ペット一覧画面（設定ボタン追加）
 │   │   │   ├── PetDetailView.swift  - ペット詳細・編集画面
+│   │   │   ├── SettingsView.swift   - ウィジェット設定画面 ✨NEW
 │   │   │   └── Components/
 │   │   │       └── PetPhotoView.swift - 写真表示コンポーネント
-│   │   └── ViewModels/
-│   │       └── PetListViewModel.swift - 一覧画面ロジック
+│   │   ├── ViewModels/
+│   │   │   ├── PetListViewModel.swift - 一覧画面ロジック
+│   │   │   └── SettingsViewModel.swift - 設定画面ロジック ✨NEW
+│   │   └── Utilities/
+│   │       └── ColorHelper.swift    - Hex⇄Color変換 ✨NEW
 │   │
 │   ├── PetWidgetExtension/           (Widget) ✅
 │   │   ├── PetWidgetExtension.swift - ウィジェット定義（全サイズ対応）
-│   │   ├── PetWidgetTimelineProvider.swift - タイムライン生成
+│   │   ├── PetWidgetTimelineProvider.swift - タイムライン生成（設定読み込み対応）
 │   │   ├── Assets.xcassets
 │   │   ├── Info.plist
 │   │   └── Views/
-│   │       ├── SmallWidgetView.swift  - Smallサイズビュー (134行)
-│   │       ├── MediumWidgetView.swift - Mediumサイズビュー (155行)
-│   │       └── LargeWidgetView.swift  - Largeサイズビュー (238行)
+│   │       ├── SmallWidgetView.swift  - Smallサイズビュー（設定適用）
+│   │       ├── MediumWidgetView.swift - Mediumサイズビュー（設定適用）
+│   │       ├── LargeWidgetView.swift  - Largeサイズビュー（設定適用）
+│   │       └── ColorHelper.swift     - Hex⇄Color変換 ✨NEW
 │   │
 │   └── Shared/                       ✅ 共有モジュール
 │       ├── Models/                   - データモデル (5ファイル)
@@ -288,12 +341,13 @@ Pet-Wijget-/
 │       │   ├── CoreDataStack.swift
 │       │   ├── PetDataManager.swift
 │       │   └── SettingsManager.swift
-│       ├── Utilities/                - ユーティリティ (5ファイル)
+│       ├── Utilities/                - ユーティリティ (6ファイル)
 │       │   ├── AppConfig.swift
 │       │   ├── AgeCalculator.swift
 │       │   ├── HumanAgeConverter.swift
 │       │   ├── PhotoManager.swift
-│       │   └── DateFormatter+Extensions.swift
+│       │   ├── DateFormatter+Extensions.swift
+│       │   └── ColorExtensions.swift - Color拡張・プリセット ✨NEW
 │       └── Errors/                   - エラー定義 (1ファイル)
 │           └── PetWidgetError.swift
 │
@@ -336,46 +390,36 @@ Pet-Wijget-/
 | **プロジェクト設定** | ██████████ 100% ✅ |
 | **ドキュメント** | ██████████ 100% ✅ |
 | **Sharedモジュール** | ██████████ 100% ✅ |
-| **Main App** | ██████████ 100% ✅ |
+| **Main App (基本)** | ██████████ 100% ✅ |
 | **Widget Extension (基本)** | ██████████ 100% ✅ |
 | **Widget サイズ拡張** | ██████████ 100% ✅ |
+| **カスタマイズ機能** | ██████████ 100% ✅ |
 | **コードクオリティ** | ██████████ 100% ✅ |
 | **Phase 1 全体** | ██████████ 100% ✅ |
-| **Phase 2 ウィジェットサイズ** | ██████████ 100% ✅ |
-| **Phase 2 全体** | █████░░░░░ 50% 🔄 |
+| **Phase 2 全体** | ██████████ 100% ✅ |
 
 ---
 
-## 🎯 次回セッションの目標（Phase 2 継続）
+## 🎯 次回セッションの目標（Phase 3）
 
-### 優先度 HIGH ✅ **完了**
+### Phase 2 完了事項 ✅
 1. ✅ Smallサイズウィジェット実装
-   - コンパクトレイアウト設計
-   - 時計 + アイコン表示
-
 2. ✅ Largeサイズウィジェット実装
-   - 詳細情報表示
-   - レイアウト設計
+3. ✅ カスタマイズ機能実装
+   - 表示項目ON/OFF
+   - フォントサイズ調整
+   - テーマ設定（背景色・文字色・フレーム）
+   - ペット選択機能
+4. ✅ 設定画面UI実装
+5. ✅ ビルド・動作確認完了
+6. ✅ feature/widget-customizationブランチをmainにマージ
 
-### 優先度 MEDIUM (次のタスク)
-3. 🎨 レイアウトカスタマイズ機能
-   - 設定画面UI実装
-   - 時計位置変更機能
-
-4. 🌈 テーマ設定機能
-   - カラーテーマ選択
-   - ダークモード対応
-
-### Phase 2 ウィジェットサイズ拡張 - 完了事項 ✅
-- [x] Xcodeでのビルド・動作確認
-- [x] シミュレータでの各サイズ表示テスト
-- [x] `@main`属性追加によるExtension読み込み修正
-- [x] feature/widget-size-supportブランチをmainにマージ
-
-### 次のステップ（Phase 2 残りタスク）
-- [ ] レイアウト編集機能の実装
-- [ ] テーマ設定機能の実装
-- [ ] UI/UX改善
+### Phase 3 候補タスク
+- [ ] ペット編集機能の実装
+- [ ] 写真トリミング機能
+- [ ] ペットのソート・並び替え
+- [ ] 時計位置の変更機能
+- [ ] ダークモード対応
 
 ---
 
@@ -395,23 +439,27 @@ Pet-Wijget-/
 
 ### Git管理状況
 - **メインブランチ**: `main`
-- **最新コミット**: `4e5a61d` (docs: Phase 2ウィジェットサイズ拡張完了を記録)
-- **直近のマージ**: `7a50df8` (Merge branch 'feature/widget-size-support')
-- **総コミット数**: 10コミット
-- **アクティブブランチ**:
-  - `main` (最新)
-  - `feature/widget-size-support` (マージ済み)
-  - `refactor/cleanup-and-improve` (マージ済み)
+- **最新コミット**: `4f43053` (Merge feature/widget-customization: Phase 2完了)
+- **総コミット数**: 13コミット
+- **マージ済みブランチ**:
+  - `feature/widget-size-support` (Small/Large対応)
+  - `feature/widget-customization` (カスタマイズ機能)
+  - `refactor/cleanup-and-improve` (リファクタリング)
 - **リモート**: https://github.com/naolab/Pet-Wijget-.git
 
 ### 実装統計
-- **総ファイル数**: 28ファイル (+8ファイル from Phase 1)
-- **コード行数**: ~2,000行（Phase 1: 1,500行 + Phase 2: 500行）
-- **Phase 2追加コード**: +446行
-  - SmallWidgetView.swift: 134行
-  - LargeWidgetView.swift: 238行
-  - PetWidgetExtension.swift修正: +25行
-  - PROGRESS.md更新: +72行
+- **総ファイル数**: 35ファイル (+15ファイル from Phase 1)
+- **コード行数**: ~2,800行
+  - Phase 1: 1,500行
+  - Phase 2 (サイズ拡張): +446行
+  - Phase 2 (カスタマイズ): +818行
+- **Phase 2カスタマイズ機能追加コード**: +818行（11ファイル変更）
+  - SettingsView.swift: 232行
+  - SettingsViewModel.swift: 146行
+  - ColorExtensions.swift: 67行
+  - ColorHelper.swift (Main): 43行
+  - ColorHelper.swift (Extension): 28行
+  - その他ウィジェットビュー更新: +302行
 
 ### Phase 1 完了成果物
 1. ✅ 動作するiOSアプリ（ペット登録・一覧・削除）
@@ -421,10 +469,24 @@ Pet-Wijget-/
 5. ✅ 年齢計算・人間換算年齢表示
 6. ✅ クリーンなコードベース
 
-### Phase 2 ウィジェットサイズ拡張 完了成果物
+### Phase 2 完了成果物
+
+#### ウィジェットサイズ拡張
 1. ✅ Smallサイズウィジェット（コンパクト表示）
 2. ✅ Largeサイズウィジェット（詳細情報表示）
 3. ✅ 3サイズ完全対応（Small/Medium/Large）
 4. ✅ サイズ別最適化レイアウト
 5. ✅ Extension読み込みバグ修正
-6. ✅ シミュレータ動作確認済み
+
+#### カスタマイズ機能
+1. ✅ 包括的な設定画面UI（6セクション構成）
+2. ✅ ペット選択機能（ウィジェットごとに表示ペットを指定）
+3. ✅ 表示項目ON/OFF（5項目：名前・年齢・人間換算年齢・時刻・日付）
+4. ✅ フォントサイズ調整（4項目：名前・年齢・時刻・日付）
+5. ✅ 日付・時刻フォーマット設定
+6. ✅ テーマ設定（背景色・文字色・写真フレーム）
+7. ✅ カラーヘルパーユーティリティ（Hex⇄Color変換）
+8. ✅ リアルタイムウィジェット更新
+9. ✅ 設定リセット機能
+10. ✅ 全ウィジェットサイズへの設定適用
+11. ✅ シミュレータ動作確認済み
