@@ -421,6 +421,35 @@ Pet-Wijget-/
 - [ ] 時計位置の変更機能
 - [ ] ダークモード対応
 
+### Implementation Plan - UI調整: タブバーによる画面分割
+- **目的**: ペット管理とウィジェット設定を常時タブ表示に統合し、シート遷移なしで切り替え可能にする。
+- **現状確認**
+  - アプリ起動時は`PetListView`を表示。
+  - 設定画面は`PetListView`の歯車ボタンからシート表示される`SettingsView`。
+- **対象ファイル**
+  - `MainTabView.swift`（新規）
+  - `PetWidgetApp.swift`（エントリーポイント更新）
+  - `PetListView.swift`（設定ボタンとシート削除）
+  - `SettingsView.swift`（NavigationView関連削除）
+- **実装ステップ**
+  1. `MainTabView.swift`
+     - `TabView`に「ペット」「ウィジェット」の2タブを作成し、LINEライクな下部アイコンレイアウトを設定。
+     - タブ1: `pawprint.fill`アイコンでタイトル「ペット」、`NavigationView`内に`PetListView`を配置。
+     - タブ2: `slider.horizontal.3`アイコンでタイトル「ウィジェット」、`NavigationView`内に`SettingsView`を配置。
+  2. `PetListView.swift`
+     - `toolbar`の歯車ボタン（`.navigationBarLeading`）を削除。
+     - `showingSettings`状態と`sheets`の関連処理を削除。
+     - それ以外の`NavigationView`構造は維持。
+  3. `SettingsView.swift`
+     - ルートの`NavigationView`と`toolbar`の「完了」ボタンを削除。
+     - `@Environment(\.dismiss)`を削除し、直に`Form`を返す構造へ変更。
+  4. `PetWidgetApp.swift`
+     - アプリエントリーポイントを`PetListView`から`MainTabView`へ差し替え。
+- **完了条件**
+  - 画面下部に2つのタブが常に表示され、各タブが期待どおりのビューを表示する。
+  - 設定画面へのアクセスにシート遷移を必要とせず、双方向に即座に切り替えられる。
+  - 既存機能の動作にリグレッションがないことを確認する。
+
 ---
 
 ## 📝 メモ・備考
