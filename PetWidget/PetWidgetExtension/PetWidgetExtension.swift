@@ -16,7 +16,6 @@ struct PetWidgetExtension: Widget {
         if #available(iOS 17.0, *) {
             return StaticConfiguration(kind: kind, provider: PetWidgetTimelineProvider()) { entry in
                 WidgetContentView(entry: entry)
-                    .containerBackground(.clear, for: .widget)
             }
             .contentMarginsDisabled()
             .configurationDisplayName("ペットウィジェット")
