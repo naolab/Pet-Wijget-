@@ -2,9 +2,13 @@ import SwiftUI
 
 struct SettingsView: View {
     @StateObject private var viewModel = SettingsViewModel()
+    @State private var selectedPreviewSize: WidgetPreviewView.WidgetSize = .medium
 
     var body: some View {
         Form {
+            // プレビューセクション
+            previewSection
+
             // ペット選択セクション
             petSelectionSection
 
@@ -33,6 +37,35 @@ struct SettingsView: View {
             if let errorMessage = viewModel.errorMessage {
                 Text(errorMessage)
             }
+        }
+    }
+
+    // MARK: - Preview Section
+    private var previewSection: some View {
+        Section {
+            VStack(spacing: 16) {
+                // サイズ選択
+                Picker("プレビューサイズ", selection: $selectedPreviewSize) {
+                    Text("小").tag(WidgetPreviewView.WidgetSize.small)
+                    Text("中").tag(WidgetPreviewView.WidgetSize.medium)
+                    Text("大").tag(WidgetPreviewView.WidgetSize.large)
+                }
+                .pickerStyle(.segmented)
+                .padding(.horizontal)
+
+                // プレビュー表示
+                let selectedPet = viewModel.getSelectedPet()
+                WidgetPreviewView(
+                    pet: selectedPet,
+                    settings: viewModel.widgetSettings,
+                    widgetSize: selectedPreviewSize
+                )
+                .padding(.vertical, 8)
+            }
+        } header: {
+            Text("プレビュー")
+        } footer: {
+            Text("設定の変更がリアルタイムで反映されます")
         }
     }
 

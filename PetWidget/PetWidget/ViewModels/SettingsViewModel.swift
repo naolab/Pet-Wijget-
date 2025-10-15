@@ -143,4 +143,21 @@ class SettingsViewModel: ObservableObject {
         widgetSettings.selectedPetID = petID
         saveSettings()
     }
+
+    // プレビュー用: 選択されたペットを取得
+    func getSelectedPet() -> Pet? {
+        do {
+            if let selectedPetID = widgetSettings.selectedPetID {
+                // 特定のペットが選択されている場合
+                return try petDataManager.fetch(by: selectedPetID)
+            } else {
+                // 「最初のペット」が選択されている場合
+                let allPets = try petDataManager.fetchAll()
+                return allPets.first
+            }
+        } catch {
+            errorMessage = "ペット情報の取得に失敗しました"
+            return nil
+        }
+    }
 }
