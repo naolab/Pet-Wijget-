@@ -13,19 +13,25 @@ struct PetWidgetExtension: Widget {
     let kind: String = "PetWidgetExtension"
 
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: kind, provider: PetWidgetTimelineProvider()) { entry in
-            if #available(iOS 17.0, *) {
+        if #available(iOS 17.0, *) {
+            return StaticConfiguration(kind: kind, provider: PetWidgetTimelineProvider()) { entry in
                 WidgetContentView(entry: entry)
                     .containerBackground(.clear, for: .widget)
-            } else {
+            }
+            .contentMarginsDisabled()
+            .configurationDisplayName("ペットウィジェット")
+            .description("ペットの写真と時刻を表示します")
+            .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
+        } else {
+            return StaticConfiguration(kind: kind, provider: PetWidgetTimelineProvider()) { entry in
                 WidgetContentView(entry: entry)
                     .padding()
                     .background()
             }
+            .configurationDisplayName("ペットウィジェット")
+            .description("ペットの写真と時刻を表示します")
+            .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
         }
-        .configurationDisplayName("ペットウィジェット")
-        .description("ペットの写真と時刻を表示します")
-        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
     }
 }
 
