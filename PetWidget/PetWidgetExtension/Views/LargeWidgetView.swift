@@ -17,23 +17,21 @@ struct LargeWidgetView: View {
         let displaySettings = settings.displaySettings
         let themeSettings = settings.themeSettings
 
-        return ZStack {
-            // 背景
+        return VStack(spacing: 0) {
+            // 上部: 時刻・日付セクション
+            timeSection(displaySettings: displaySettings, themeSettings: themeSettings)
+
+            Divider()
+                .padding(.vertical, 12)
+
+            // 下部: ペット情報セクション
+            petInfoSection(pet: pet, displaySettings: displaySettings, themeSettings: themeSettings)
+
+            Spacer()
+        }
+        .padding(16)
+        .containerBackground(for: .widget) {
             backgroundView(themeSettings: themeSettings)
-
-            VStack(spacing: 0) {
-                // 上部: 時刻・日付セクション
-                timeSection(displaySettings: displaySettings, themeSettings: themeSettings)
-
-                Divider()
-                    .padding(.vertical, 12)
-
-                // 下部: ペット情報セクション
-                petInfoSection(pet: pet, displaySettings: displaySettings, themeSettings: themeSettings)
-
-                Spacer()
-            }
-            .padding(16)
         }
     }
 
@@ -223,6 +221,9 @@ struct LargeWidgetView: View {
             Spacer()
         }
         .padding(16)
+        .containerBackground(for: .widget) {
+            Color.gray.opacity(0.1)
+        }
     }
 
     // MARK: - Helper Functions
