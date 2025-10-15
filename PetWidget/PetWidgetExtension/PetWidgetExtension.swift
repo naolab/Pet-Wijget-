@@ -16,7 +16,7 @@ struct PetWidgetExtension: Widget {
         StaticConfiguration(kind: kind, provider: PetWidgetTimelineProvider()) { entry in
             if #available(iOS 17.0, *) {
                 WidgetContentView(entry: entry)
-                    .containerBackground(.fill.tertiary, for: .widget)
+                    .containerBackground(.clear, for: .widget)
             } else {
                 WidgetContentView(entry: entry)
                     .padding()

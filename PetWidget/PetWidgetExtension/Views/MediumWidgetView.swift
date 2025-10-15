@@ -5,19 +5,10 @@ struct MediumWidgetView: View {
     let entry: PetWidgetEntry
 
     var body: some View {
-        Group {
-            if let pet = entry.pet {
-                petContentView(pet: pet)
-            } else {
-                emptyStateView
-            }
-        }
-        .containerBackground(for: .widget) {
-            if let pet = entry.pet {
-                backgroundView(themeSettings: entry.settings.themeSettings)
-            } else {
-                Color.gray.opacity(0.1)
-            }
+        if let pet = entry.pet {
+            petContentView(pet: pet)
+        } else {
+            emptyStateView
         }
     }
 
@@ -26,59 +17,64 @@ struct MediumWidgetView: View {
         let displaySettings = settings.displaySettings
         let themeSettings = settings.themeSettings
 
-        return HStack(spacing: 16) {
-            // 左側: ペット写真
-            petPhotoView(photoData: pet.photoData, frameType: themeSettings.photoFrameType)
+        return ZStack {
+            // 背景
+            backgroundView(themeSettings: themeSettings)
 
-            // 右側: 時刻・ペット情報
-            VStack(alignment: .leading, spacing: 8) {
-                // 現在時刻
-                if displaySettings.showTime {
-                    Text(entry.date, style: .time)
-                        .font(.system(size: CGFloat(displaySettings.timeFontSize), weight: .bold))
-                        .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor))
-                }
+            HStack(spacing: 16) {
+                // 左側: ペット写真
+                petPhotoView(photoData: pet.photoData, frameType: themeSettings.photoFrameType)
 
-                // 日付
-                if displaySettings.showDate {
-                    Text(formattedDate(entry.date, format: displaySettings.dateFormat))
-                        .font(.system(size: CGFloat(displaySettings.dateFontSize)))
-                        .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.7))
-                }
-
-                Divider()
-                    .padding(.vertical, 4)
-
-                // ペット名
-                if displaySettings.showName {
-                    HStack(spacing: 4) {
-                        Image(systemName: speciesIcon(pet.species))
-                            .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.7))
-                        Text(pet.name)
-                            .font(.system(size: CGFloat(displaySettings.nameFontSize), weight: .semibold))
+                // 右側: 時刻・ペット情報
+                VStack(alignment: .leading, spacing: 8) {
+                    // 現在時刻
+                    if displaySettings.showTime {
+                        Text(entry.date, style: .time)
+                            .font(.system(size: CGFloat(displaySettings.timeFontSize), weight: .bold))
                             .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor))
                     }
-                }
 
-                // 年齢情報
-                VStack(alignment: .leading, spacing: 2) {
-                    if displaySettings.showAge {
-                        Text(ageText(pet))
-                            .font(.system(size: CGFloat(displaySettings.ageFontSize)))
+                    // 日付
+                    if displaySettings.showDate {
+                        Text(formattedDate(entry.date, format: displaySettings.dateFormat))
+                            .font(.system(size: CGFloat(displaySettings.dateFontSize)))
                             .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.7))
                     }
 
-                    if displaySettings.showHumanAge {
-                        Text("人間だと \(pet.humanAge)歳")
-                            .font(.system(size: CGFloat(displaySettings.ageFontSize * 0.9)))
-                            .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.7))
+                    Divider()
+                        .padding(.vertical, 4)
+
+                    // ペット名
+                    if displaySettings.showName {
+                        HStack(spacing: 4) {
+                            Image(systemName: speciesIcon(pet.species))
+                                .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.7))
+                            Text(pet.name)
+                                .font(.system(size: CGFloat(displaySettings.nameFontSize), weight: .semibold))
+                                .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor))
+                        }
+                    }
+
+                    // 年齢情報
+                    VStack(alignment: .leading, spacing: 2) {
+                        if displaySettings.showAge {
+                            Text(ageText(pet))
+                                .font(.system(size: CGFloat(displaySettings.ageFontSize)))
+                                .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.7))
+                        }
+
+                        if displaySettings.showHumanAge {
+                            Text("人間だと \(pet.humanAge)歳")
+                                .font(.system(size: CGFloat(displaySettings.ageFontSize * 0.9)))
+                                .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.7))
+                        }
                     }
                 }
+
+                Spacer()
             }
-
-            Spacer()
+            .padding()
         }
-        .padding()
     }
 
     private func backgroundView(themeSettings: ThemeSettings) -> some View {
