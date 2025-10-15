@@ -5,10 +5,19 @@ struct SmallWidgetView: View {
     let entry: PetWidgetEntry
 
     var body: some View {
-        if let pet = entry.pet {
-            petContentView(pet: pet)
-        } else {
-            emptyStateView
+        Group {
+            if let pet = entry.pet {
+                petContentView(pet: pet)
+            } else {
+                emptyStateView
+            }
+        }
+        .containerBackground(for: .widget) {
+            if let pet = entry.pet {
+                backgroundView(themeSettings: entry.settings.themeSettings)
+            } else {
+                Color.gray.opacity(0.1)
+            }
         }
     }
 
@@ -42,9 +51,6 @@ struct SmallWidgetView: View {
             }
         }
         .padding(12)
-        .containerBackground(for: .widget) {
-            backgroundView(themeSettings: themeSettings)
-        }
     }
 
     private func backgroundView(themeSettings: ThemeSettings) -> some View {
