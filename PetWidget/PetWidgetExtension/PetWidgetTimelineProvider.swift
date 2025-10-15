@@ -17,11 +17,12 @@ struct PetWidgetTimelineProvider: TimelineProvider {
     private let settingsManager = SettingsManager.shared
 
     func placeholder(in context: Context) -> PetWidgetEntry {
-        PetWidgetEntry(
+        let settings = loadSettings()
+        return PetWidgetEntry(
             date: Date(),
             pet: createSamplePet(),
             errorMessage: nil,
-            settings: .default
+            settings: settings
         )
     }
 
@@ -29,11 +30,12 @@ struct PetWidgetTimelineProvider: TimelineProvider {
         let entry: PetWidgetEntry
 
         if context.isPreview {
+            let settings = loadSettings()
             entry = PetWidgetEntry(
                 date: Date(),
                 pet: createSamplePet(),
                 errorMessage: nil,
-                settings: .default
+                settings: settings
             )
         } else {
             entry = createEntry(for: Date())
@@ -124,6 +126,17 @@ struct PetWidgetTimelineProvider: TimelineProvider {
                 errorMessage: "データの読み込みに失敗しました: \(error.localizedDescription)",
                 settings: settings
             )
+        }
+    }
+
+    private func loadSettings() -> WidgetSettings {
+        do {
+            return try settingsManager.loadWidgetSettings()
+        } catch {
+            #if DEBUG
+            print("⚠️ Widget: Failed to load settings, using defaults: \(error)")
+            #endif
+            return .default
         }
     }
 
