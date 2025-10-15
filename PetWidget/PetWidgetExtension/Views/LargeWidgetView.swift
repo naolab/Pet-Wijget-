@@ -5,10 +5,19 @@ struct LargeWidgetView: View {
     let entry: PetWidgetEntry
 
     var body: some View {
-        if let pet = entry.pet {
-            petContentView(pet: pet)
-        } else {
-            emptyStateView
+        Group {
+            if let pet = entry.pet {
+                petContentView(pet: pet)
+            } else {
+                emptyStateView
+            }
+        }
+        .containerBackground(for: .widget) {
+            if let pet = entry.pet {
+                backgroundView(themeSettings: entry.settings.themeSettings)
+            } else {
+                Color.gray.opacity(0.1)
+            }
         }
     }
 
@@ -17,24 +26,19 @@ struct LargeWidgetView: View {
         let displaySettings = settings.displaySettings
         let themeSettings = settings.themeSettings
 
-        return ZStack {
-            // 背景
-            backgroundView(themeSettings: themeSettings)
+        return VStack(spacing: 0) {
+            // 上部: 時刻・日付セクション
+            timeSection(displaySettings: displaySettings, themeSettings: themeSettings)
 
-            VStack(spacing: 0) {
-                // 上部: 時刻・日付セクション
-                timeSection(displaySettings: displaySettings, themeSettings: themeSettings)
+            Divider()
+                .padding(.vertical, 12)
 
-                Divider()
-                    .padding(.vertical, 12)
+            // 下部: ペット情報セクション
+            petInfoSection(pet: pet, displaySettings: displaySettings, themeSettings: themeSettings)
 
-                // 下部: ペット情報セクション
-                petInfoSection(pet: pet, displaySettings: displaySettings, themeSettings: themeSettings)
-
-                Spacer()
-            }
-            .padding(16)
+            Spacer()
         }
+        .padding(16)
     }
 
     private func backgroundView(themeSettings: ThemeSettings) -> some View {

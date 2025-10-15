@@ -5,10 +5,19 @@ struct SmallWidgetView: View {
     let entry: PetWidgetEntry
 
     var body: some View {
-        if let pet = entry.pet {
-            petContentView(pet: pet)
-        } else {
-            emptyStateView
+        Group {
+            if let pet = entry.pet {
+                petContentView(pet: pet)
+            } else {
+                emptyStateView
+            }
+        }
+        .containerBackground(for: .widget) {
+            if let pet = entry.pet {
+                backgroundView(themeSettings: entry.settings.themeSettings)
+            } else {
+                Color.gray.opacity(0.1)
+            }
         }
     }
 
@@ -17,36 +26,31 @@ struct SmallWidgetView: View {
         let displaySettings = settings.displaySettings
         let themeSettings = settings.themeSettings
 
-        return ZStack {
-            // 背景
-            backgroundView(themeSettings: themeSettings)
+        return VStack(spacing: 8) {
+            // ペット写真 (小さめ)
+            petPhotoView(photoData: pet.photoData, frameType: themeSettings.photoFrameType)
 
-            VStack(spacing: 8) {
-                // ペット写真 (小さめ)
-                petPhotoView(photoData: pet.photoData, frameType: themeSettings.photoFrameType)
+            // 現在時刻 (大きく表示)
+            if displaySettings.showTime {
+                Text(entry.date, style: .time)
+                    .font(.system(size: CGFloat(displaySettings.timeFontSize), weight: .bold, design: .rounded))
+                    .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor))
+            }
 
-                // 現在時刻 (大きく表示)
-                if displaySettings.showTime {
-                    Text(entry.date, style: .time)
-                        .font(.system(size: CGFloat(displaySettings.timeFontSize), weight: .bold, design: .rounded))
-                        .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor))
-                }
-
-                // ペット名 (コンパクト)
-                if displaySettings.showName {
-                    HStack(spacing: 2) {
-                        Image(systemName: speciesIcon(pet.species))
-                            .font(.system(size: 8))
-                            .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.7))
-                        Text(pet.name)
-                            .font(.system(size: CGFloat(displaySettings.nameFontSize * 0.6), weight: .medium))
-                            .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.7))
-                            .lineLimit(1)
-                    }
+            // ペット名 (コンパクト)
+            if displaySettings.showName {
+                HStack(spacing: 2) {
+                    Image(systemName: speciesIcon(pet.species))
+                        .font(.system(size: 8))
+                        .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.7))
+                    Text(pet.name)
+                        .font(.system(size: CGFloat(displaySettings.nameFontSize * 0.6), weight: .medium))
+                        .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.7))
+                        .lineLimit(1)
                 }
             }
-            .padding(12)
         }
+        .padding(12)
     }
 
     private func backgroundView(themeSettings: ThemeSettings) -> some View {
