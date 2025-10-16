@@ -312,7 +312,12 @@ struct WidgetPreviewView: View {
         switch species {
         case .dog: return "pawprint.fill"
         case .cat: return "cat.fill"
-        case .other: return "hare.fill"
+        case .fish: return "fish.fill"
+        case .smallAnimal: return "hare.fill"
+        case .turtle: return "tortoise.fill"
+        case .bird: return "bird.fill"
+        case .insect: return "ladybug.fill"
+        case .other: return "questionmark.circle.fill"
         }
     }
 }
