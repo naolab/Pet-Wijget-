@@ -188,8 +188,18 @@ struct PetRowView: View {
             return "pawprint.fill"
         case .cat:
             return "cat.fill"
-        case .other:
+        case .fish:
+            return "fish.fill"
+        case .smallAnimal:
             return "hare.fill"
+        case .turtle:
+            return "tortoise.fill"
+        case .bird:
+            return "bird.fill"
+        case .insect:
+            return "ladybug.fill"
+        case .other:
+            return "questionmark.circle.fill"
         }
     }
 }
