@@ -8,7 +8,7 @@ final class HumanAgeConverter {
     /// - Returns: 人間年齢（歳）
     static func convert(pet: Pet, customLifespan: Double? = nil) -> Int {
         let profile = pet.species.ageConversionProfile
-        let realAge = Double(pet.ageInYears)
+        let realAge = pet.ageInYearsWithDecimals
         return profile.calculateHumanAge(realAge: realAge, customLifespan: customLifespan)
     }
 

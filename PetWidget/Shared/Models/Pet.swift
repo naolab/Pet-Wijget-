@@ -33,6 +33,12 @@ struct Pet: Identifiable, Codable, Equatable {
         Calendar.current.dateComponents([.year], from: birthDate, to: Date()).year ?? 0
     }
 
+    // 年齢計算(日単位で小数点付き年齢)
+    var ageInYearsWithDecimals: Double {
+        let days = Calendar.current.dateComponents([.day], from: birthDate, to: Date()).day ?? 0
+        return Double(days) / 365.25
+    }
+
     // 年齢計算(月単位まで)
     var ageComponents: DateComponents {
         Calendar.current.dateComponents([.year, .month], from: birthDate, to: Date())
