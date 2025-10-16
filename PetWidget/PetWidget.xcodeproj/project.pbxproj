@@ -40,6 +40,8 @@
 		35C50EBE2E9A024D004121B1 /* DisplaySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C50E962E9A024D004121B1 /* DisplaySettings.swift */; };
 		35C50EC12E9A6D32004121B1 /* PetWidget/PetWidget.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 35C50EBF2E9A6D32004121B1 /* PetWidget/PetWidget.xcdatamodeld */; };
 		35C50EC22E9A6D32004121B1 /* PetWidget/PetWidget.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 35C50EBF2E9A6D32004121B1 /* PetWidget/PetWidget.xcdatamodeld */; };
+		35F281152EA1280F00E4F907 /* DogBreed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35F281142EA1280F00E4F907 /* DogBreed.swift */; };
+		35F281162EA1280F00E4F907 /* DogBreed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35F281142EA1280F00E4F907 /* DogBreed.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -103,6 +105,7 @@
 		35C50E9F2E9A024D004121B1 /* HumanAgeConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HumanAgeConverter.swift; sourceTree = "<group>"; };
 		35C50EA02E9A024D004121B1 /* PhotoManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoManager.swift; sourceTree = "<group>"; };
 		35C50EC02E9A6D32004121B1 /* PetWidget.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = PetWidget.xcdatamodel; sourceTree = "<group>"; };
+		35F281142EA1280F00E4F907 /* DogBreed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogBreed.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -241,6 +244,7 @@
 		35C50E9B2E9A024D004121B1 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				35F281142EA1280F00E4F907 /* DogBreed.swift */,
 				35C50E962E9A024D004121B1 /* DisplaySettings.swift */,
 				35C50E972E9A024D004121B1 /* Pet.swift */,
 				35C50E982E9A024D004121B1 /* PetType.swift */,
@@ -462,6 +466,7 @@
 				35C50EA92E9A024D004121B1 /* WidgetSettings.swift in Sources */,
 				35C50EAA2E9A024D004121B1 /* PhotoManager.swift in Sources */,
 				35C50EAB2E9A024D004121B1 /* PetType.swift in Sources */,
+				35F281162EA1280F00E4F907 /* DogBreed.swift in Sources */,
 				35C50EAC2E9A024D004121B1 /* ThemeSettings.swift in Sources */,
 				35C50EAD2E9A024D004121B1 /* AgeCalculator.swift in Sources */,
 				35C50EAE2E9A024D004121B1 /* SettingsManager.swift in Sources */,
@@ -492,6 +497,7 @@
 				35C50EB22E9A024D004121B1 /* CoreDataStack.swift in Sources */,
 				35C50EB32E9A024D004121B1 /* HumanAgeConverter.swift in Sources */,
 				35C50EB42E9A024D004121B1 /* AppConfig.swift in Sources */,
+				35F281152EA1280F00E4F907 /* DogBreed.swift in Sources */,
 				35C50EB52E9A024D004121B1 /* PetWidgetError.swift in Sources */,
 				35C50EB62E9A024D004121B1 /* PetDataManager.swift in Sources */,
 				35C50EB72E9A024D004121B1 /* WidgetSettings.swift in Sources */,

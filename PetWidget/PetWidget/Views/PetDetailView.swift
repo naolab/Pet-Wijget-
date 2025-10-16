@@ -10,6 +10,7 @@ struct PetDetailView: View {
     @State private var name: String = ""
     @State private var birthDate: Date = Date()
     @State private var selectedSpecies: PetType = .dog
+    @State private var selectedBreed: DogBreed?
     @State private var photoData: Data?
 
     @State private var selectedPhotoItem: PhotosPickerItem?
@@ -39,6 +40,43 @@ struct PetDetailView: View {
                                 Text(displayNameForSpecies(type))
                             }
                             .tag(type)
+                        }
+                    }
+                    .onChange(of: selectedSpecies) { _, newValue in
+                        // 種別が犬以外に変更されたら犬種をクリア
+                        if newValue != .dog {
+                            selectedBreed = nil
+                        }
+                    }
+
+                    // 犬の場合のみ犬種選択を表示
+                    if selectedSpecies == .dog {
+                        Picker("犬種", selection: $selectedBreed) {
+                            Text("選択してください").tag(nil as DogBreed?)
+
+                            Section(header: Text("小型犬")) {
+                                ForEach(DogBreed.smallBreeds, id: \.self) { breed in
+                                    Text(breed.displayName).tag(breed as DogBreed?)
+                                }
+                            }
+
+                            Section(header: Text("中型犬")) {
+                                ForEach(DogBreed.mediumBreeds, id: \.self) { breed in
+                                    Text(breed.displayName).tag(breed as DogBreed?)
+                                }
+                            }
+
+                            Section(header: Text("大型犬")) {
+                                ForEach(DogBreed.largeBreeds, id: \.self) { breed in
+                                    Text(breed.displayName).tag(breed as DogBreed?)
+                                }
+                            }
+
+                            Section(header: Text("その他")) {
+                                ForEach(DogBreed.otherBreeds, id: \.self) { breed in
+                                    Text(breed.displayName).tag(breed as DogBreed?)
+                                }
+                            }
                         }
                     }
                 }
@@ -105,6 +143,12 @@ struct PetDetailView: View {
                     birthDate = pet.birthDate
                     selectedSpecies = pet.species
                     photoData = pet.photoData
+
+                    // 犬種の読み込み
+                    if let breedString = pet.breed,
+                       let breed = DogBreed(rawValue: breedString) {
+                        selectedBreed = breed
+                    }
                 }
             }
         }
@@ -118,14 +162,17 @@ struct PetDetailView: View {
                 name: name,
                 birthDate: birthDate,
                 species: selectedSpecies,
-                photoData: photoData
+                photoData: photoData,
+                displayOrder: existingPet.displayOrder,
+                breed: selectedBreed?.rawValue
             )
         } else {
             newPet = Pet(
                 name: name,
                 birthDate: birthDate,
                 species: selectedSpecies,
-                photoData: photoData
+                photoData: photoData,
+                breed: selectedBreed?.rawValue
             )
         }
 
@@ -156,7 +203,8 @@ struct PetDetailView: View {
             name: name.isEmpty ? "名前未設定" : name,
             birthDate: birthDate,
             species: selectedSpecies,
-            photoData: photoData
+            photoData: photoData,
+            breed: selectedBreed?.rawValue
         )
     }
 
