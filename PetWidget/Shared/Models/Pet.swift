@@ -9,6 +9,7 @@ struct Pet: Identifiable, Codable, Equatable {
     var createdAt: Date
     var updatedAt: Date
     var displayOrder: Int
+    var breed: String?  // 犬種コード（DogBreed.rawValue）
 
     init(
         id: UUID = UUID(),
@@ -16,7 +17,8 @@ struct Pet: Identifiable, Codable, Equatable {
         birthDate: Date,
         species: PetType,
         photoData: Data? = nil,
-        displayOrder: Int = 0
+        displayOrder: Int = 0,
+        breed: String? = nil
     ) {
         self.id = id
         self.name = name
@@ -26,6 +28,7 @@ struct Pet: Identifiable, Codable, Equatable {
         self.createdAt = Date()
         self.updatedAt = Date()
         self.displayOrder = displayOrder
+        self.breed = breed
     }
 
     // 年齢計算(年単位)
@@ -44,9 +47,33 @@ struct Pet: Identifiable, Codable, Equatable {
         Calendar.current.dateComponents([.year, .month], from: birthDate, to: Date())
     }
 
+    // カスタム平均寿命（犬種または猫種が設定されている場合）
+    var customLifespan: Double? {
+        guard let breedString = breed else {
+            return nil
+        }
+
+        switch species {
+        case .dog:
+            guard let dogBreed = DogBreed(rawValue: breedString) else {
+                return nil
+            }
+            return dogBreed.averageLifespan
+
+        case .cat:
+            guard let catBreed = CatBreed(rawValue: breedString) else {
+                return nil
+            }
+            return catBreed.averageLifespan
+
+        default:
+            return nil
+        }
+    }
+
     // 人間換算年齢
     var humanAge: Int {
-        HumanAgeConverter.convert(pet: self)
+        HumanAgeConverter.convert(pet: self, customLifespan: customLifespan)
     }
 }
 
