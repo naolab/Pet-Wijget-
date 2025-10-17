@@ -47,14 +47,28 @@ struct Pet: Identifiable, Codable, Equatable {
         Calendar.current.dateComponents([.year, .month], from: birthDate, to: Date())
     }
 
-    // カスタム平均寿命（犬種が設定されている場合）
+    // カスタム平均寿命（犬種または猫種が設定されている場合）
     var customLifespan: Double? {
-        guard species == .dog,
-              let breedString = breed,
-              let dogBreed = DogBreed(rawValue: breedString) else {
+        guard let breedString = breed else {
             return nil
         }
-        return dogBreed.averageLifespan
+
+        switch species {
+        case .dog:
+            guard let dogBreed = DogBreed(rawValue: breedString) else {
+                return nil
+            }
+            return dogBreed.averageLifespan
+
+        case .cat:
+            guard let catBreed = CatBreed(rawValue: breedString) else {
+                return nil
+            }
+            return catBreed.averageLifespan
+
+        default:
+            return nil
+        }
     }
 
     // 人間換算年齢

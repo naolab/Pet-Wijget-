@@ -10,7 +10,8 @@ struct PetDetailView: View {
     @State private var name: String = ""
     @State private var birthDate: Date = Date()
     @State private var selectedSpecies: PetType = .dog
-    @State private var selectedBreed: DogBreed?
+    @State private var selectedDogBreed: DogBreed?
+    @State private var selectedCatBreed: CatBreed?
     @State private var photoData: Data?
 
     @State private var selectedPhotoItem: PhotosPickerItem?
@@ -43,15 +44,18 @@ struct PetDetailView: View {
                         }
                     }
                     .onChange(of: selectedSpecies) { _, newValue in
-                        // 種別が犬以外に変更されたら犬種をクリア
+                        // 種別が変更されたら品種をクリア
                         if newValue != .dog {
-                            selectedBreed = nil
+                            selectedDogBreed = nil
+                        }
+                        if newValue != .cat {
+                            selectedCatBreed = nil
                         }
                     }
 
                     // 犬の場合のみ犬種選択を表示
                     if selectedSpecies == .dog {
-                        Picker("犬種", selection: $selectedBreed) {
+                        Picker("犬種", selection: $selectedDogBreed) {
                             Text("選択してください").tag(nil as DogBreed?)
 
                             Section(header: Text("小型犬")) {
@@ -76,6 +80,17 @@ struct PetDetailView: View {
                                 ForEach(DogBreed.otherBreeds, id: \.self) { breed in
                                     Text(breed.displayName).tag(breed as DogBreed?)
                                 }
+                            }
+                        }
+                    }
+
+                    // 猫の場合のみ猫種選択を表示
+                    if selectedSpecies == .cat {
+                        Picker("猫種", selection: $selectedCatBreed) {
+                            Text("選択してください").tag(nil as CatBreed?)
+
+                            ForEach(CatBreed.allCases, id: \.self) { breed in
+                                Text(breed.displayName).tag(breed as CatBreed?)
                             }
                         }
                     }
@@ -144,10 +159,20 @@ struct PetDetailView: View {
                     selectedSpecies = pet.species
                     photoData = pet.photoData
 
-                    // 犬種の読み込み
-                    if let breedString = pet.breed,
-                       let breed = DogBreed(rawValue: breedString) {
-                        selectedBreed = breed
+                    // 品種の読み込み
+                    if let breedString = pet.breed {
+                        switch pet.species {
+                        case .dog:
+                            if let breed = DogBreed(rawValue: breedString) {
+                                selectedDogBreed = breed
+                            }
+                        case .cat:
+                            if let breed = CatBreed(rawValue: breedString) {
+                                selectedCatBreed = breed
+                            }
+                        default:
+                            break
+                        }
                     }
                 }
             }
@@ -155,6 +180,17 @@ struct PetDetailView: View {
     }
 
     private func savePet() {
+        // 選択された品種の取得
+        let breedString: String?
+        switch selectedSpecies {
+        case .dog:
+            breedString = selectedDogBreed?.rawValue
+        case .cat:
+            breedString = selectedCatBreed?.rawValue
+        default:
+            breedString = nil
+        }
+
         let newPet: Pet
         if let existingPet = pet {
             newPet = Pet(
@@ -164,7 +200,7 @@ struct PetDetailView: View {
                 species: selectedSpecies,
                 photoData: photoData,
                 displayOrder: existingPet.displayOrder,
-                breed: selectedBreed?.rawValue
+                breed: breedString
             )
         } else {
             newPet = Pet(
@@ -172,7 +208,7 @@ struct PetDetailView: View {
                 birthDate: birthDate,
                 species: selectedSpecies,
                 photoData: photoData,
-                breed: selectedBreed?.rawValue
+                breed: breedString
             )
         }
 
@@ -198,13 +234,24 @@ struct PetDetailView: View {
     }
 
     private func createPreviewPet() -> Pet {
-        Pet(
+        // 選択された品種の取得
+        let breedString: String?
+        switch selectedSpecies {
+        case .dog:
+            breedString = selectedDogBreed?.rawValue
+        case .cat:
+            breedString = selectedCatBreed?.rawValue
+        default:
+            breedString = nil
+        }
+
+        return Pet(
             id: pet?.id ?? UUID(),
             name: name.isEmpty ? "名前未設定" : name,
             birthDate: birthDate,
             species: selectedSpecies,
             photoData: photoData,
-            breed: selectedBreed?.rawValue
+            breed: breedString
         )
     }
 
