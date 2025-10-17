@@ -33,6 +33,7 @@ struct PetDetailView: View {
                         in: ...Date(),
                         displayedComponents: .date
                     )
+                    .environment(\.locale, Locale(identifier: "ja_JP"))
 
                     Picker("種別", selection: $selectedSpecies) {
                         ForEach(PetType.allCases, id: \.self) { type in
