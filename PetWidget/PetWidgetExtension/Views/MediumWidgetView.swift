@@ -31,7 +31,7 @@ struct MediumWidgetView: View {
             petPhotoView(photoData: pet.photoData, frameType: themeSettings.photoFrameType)
 
             // 右側: 時刻・ペット情報
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: displaySettings.textAlignment.horizontalAlignment, spacing: 8) {
                 // 現在時刻
                 if displaySettings.showTime {
                     Text(entry.date, style: .time)
@@ -64,7 +64,7 @@ struct MediumWidgetView: View {
                 }
 
                 // 年齢情報
-                VStack(alignment: .leading, spacing: 2) {
+                VStack(alignment: displaySettings.textAlignment.horizontalAlignment, spacing: 2) {
                     if displaySettings.showAge {
                         Text(ageText(pet))
                             .font(.system(size: CGFloat(displaySettings.ageFontSize)))
@@ -78,6 +78,7 @@ struct MediumWidgetView: View {
                     }
                 }
             }
+            .frame(maxWidth: .infinity, alignment: displaySettings.textAlignment.alignment)
 
             Spacer()
         }

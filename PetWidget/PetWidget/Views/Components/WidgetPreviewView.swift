@@ -95,6 +95,7 @@ struct WidgetPreviewView: View {
                 }
             }
         }
+        .frame(maxWidth: .infinity, alignment: displaySettings.textAlignment.alignment)
         .padding(12)
     }
 
@@ -105,7 +106,7 @@ struct WidgetPreviewView: View {
             petPhotoView(photoData: pet.photoData, frameType: themeSettings.photoFrameType, size: 120)
 
             // 右側: 時刻・ペット情報
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: displaySettings.textAlignment.horizontalAlignment, spacing: 8) {
                 // 現在時刻
                 if displaySettings.showTime {
                     Text(Date(), style: .time)
@@ -138,7 +139,7 @@ struct WidgetPreviewView: View {
                 }
 
                 // 年齢情報
-                VStack(alignment: .leading, spacing: 2) {
+                VStack(alignment: displaySettings.textAlignment.horizontalAlignment, spacing: 2) {
                     if displaySettings.showAge {
                         Text(ageText(pet))
                             .font(.system(size: CGFloat(displaySettings.ageFontSize)))
@@ -152,6 +153,7 @@ struct WidgetPreviewView: View {
                     }
                 }
             }
+            .frame(maxWidth: .infinity, alignment: displaySettings.textAlignment.alignment)
 
             Spacer()
         }
@@ -175,6 +177,7 @@ struct WidgetPreviewView: View {
                         .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.7))
                 }
             }
+            .frame(maxWidth: .infinity, alignment: displaySettings.textAlignment.alignment)
 
             // 区切り線（時刻・日付が表示されていて、かつshowDividerがtrueの場合のみ表示）
             if displaySettings.showDivider && (displaySettings.showTime || displaySettings.showDate) {
@@ -198,7 +201,7 @@ struct WidgetPreviewView: View {
 
                 HStack(spacing: 16) {
                     if displaySettings.showAge {
-                        VStack(alignment: .leading, spacing: 2) {
+                        VStack(alignment: displaySettings.textAlignment.horizontalAlignment, spacing: 2) {
                             Text("年齢")
                                 .font(.caption2)
                                 .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.5))
@@ -209,7 +212,7 @@ struct WidgetPreviewView: View {
                     }
 
                     if displaySettings.showHumanAge {
-                        VStack(alignment: .leading, spacing: 2) {
+                        VStack(alignment: displaySettings.textAlignment.horizontalAlignment, spacing: 2) {
                             Text("人間換算")
                                 .font(.caption2)
                                 .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.5))
@@ -220,6 +223,7 @@ struct WidgetPreviewView: View {
                     }
                 }
             }
+            .frame(maxWidth: .infinity, alignment: displaySettings.textAlignment.alignment)
         }
         .padding()
     }

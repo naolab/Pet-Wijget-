@@ -50,6 +50,7 @@ struct SmallWidgetView: View {
                 }
             }
         }
+        .frame(maxWidth: .infinity, alignment: displaySettings.textAlignment.alignment)
         .padding(12)
     }
 
