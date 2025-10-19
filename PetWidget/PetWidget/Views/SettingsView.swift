@@ -15,6 +15,9 @@ struct SettingsView: View {
             // 表示項目セクション
             displayItemsSection
 
+            // レイアウトセクション
+            layoutSection
+
             // フォントサイズセクション
             fontSizeSection
 
@@ -133,6 +136,25 @@ struct SettingsView: View {
             Text("表示項目")
         } footer: {
             Text("時刻・日付が両方非表示の場合、区切り線は自動的に非表示になります")
+        }
+    }
+
+    // MARK: - Layout Section
+    private var layoutSection: some View {
+        Section {
+            Picker("テキスト配置", selection: $viewModel.widgetSettings.displaySettings.textAlignment) {
+                ForEach(TextAlignmentType.allCases, id: \.self) { alignment in
+                    Text(alignment.displayName).tag(alignment)
+                }
+            }
+            .pickerStyle(.segmented)
+            .onChange(of: viewModel.widgetSettings.displaySettings.textAlignment) { _, _ in
+                viewModel.saveSettings()
+            }
+        } header: {
+            Text("レイアウト")
+        } footer: {
+            Text("ウィジェット内のテキストの配置を変更します")
         }
     }
 

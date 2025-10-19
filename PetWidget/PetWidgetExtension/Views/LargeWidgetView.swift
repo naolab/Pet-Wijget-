@@ -86,6 +86,7 @@ struct LargeWidgetView: View {
                     .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.7))
             }
         }
+        .frame(maxWidth: .infinity, alignment: displaySettings.textAlignment.alignment)
     }
 
     // MARK: - ペット情報セクション
@@ -95,7 +96,7 @@ struct LargeWidgetView: View {
             petPhotoView(photoData: pet.photoData, frameType: themeSettings.photoFrameType)
 
             // 右側: 詳細情報
-            VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: displaySettings.textAlignment.horizontalAlignment, spacing: 12) {
                 // ペット名
                 if displaySettings.showName {
                     HStack(spacing: 6) {
@@ -119,7 +120,7 @@ struct LargeWidgetView: View {
                 }
 
                 // 年齢情報
-                VStack(alignment: .leading, spacing: 6) {
+                VStack(alignment: displaySettings.textAlignment.horizontalAlignment, spacing: 6) {
                     if displaySettings.showAge {
                         HStack(spacing: 4) {
                             Image(systemName: "calendar.badge.clock")
@@ -143,6 +144,7 @@ struct LargeWidgetView: View {
                     }
                 }
             }
+            .frame(maxWidth: .infinity, alignment: displaySettings.textAlignment.alignment)
 
             Spacer()
         }
