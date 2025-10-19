@@ -13,8 +13,22 @@ struct PetWidgetExtension: Widget {
     let kind: String = "PetWidgetExtension"
 
     var body: some WidgetConfiguration {
+        if #available(iOS 16.0, *) {
+            return IntentBasedWidget(kind: kind)
+        } else {
+            return StaticBasedWidget(kind: kind)
+        }
+    }
+}
+
+// iOS 16+用のAppIntent対応Widget
+@available(iOS 16.0, *)
+struct IntentBasedWidget: WidgetConfiguration {
+    let kind: String
+
+    var body: some WidgetConfiguration {
         if #available(iOS 17.0, *) {
-            return StaticConfiguration(kind: kind, provider: PetWidgetTimelineProvider()) { entry in
+            return AppIntentConfiguration(kind: kind, intent: SelectPetIntent.self, provider: PetWidgetIntentTimelineProvider()) { entry in
                 WidgetContentView(entry: entry)
             }
             .contentMarginsDisabled()
@@ -22,7 +36,7 @@ struct PetWidgetExtension: Widget {
             .description("ペットの写真と時刻を表示します")
             .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
         } else {
-            return StaticConfiguration(kind: kind, provider: PetWidgetTimelineProvider()) { entry in
+            return AppIntentConfiguration(kind: kind, intent: SelectPetIntent.self, provider: PetWidgetIntentTimelineProvider()) { entry in
                 WidgetContentView(entry: entry)
                     .padding()
                     .background()
@@ -31,6 +45,22 @@ struct PetWidgetExtension: Widget {
             .description("ペットの写真と時刻を表示します")
             .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
         }
+    }
+}
+
+// iOS 15以前用のStatic Widget
+struct StaticBasedWidget: WidgetConfiguration {
+    let kind: String
+
+    var body: some WidgetConfiguration {
+        StaticConfiguration(kind: kind, provider: PetWidgetTimelineProvider()) { entry in
+            WidgetContentView(entry: entry)
+                .padding()
+                .background()
+        }
+        .configurationDisplayName("ペットウィジェット")
+        .description("ペットの写真と時刻を表示します")
+        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
     }
 }
 
