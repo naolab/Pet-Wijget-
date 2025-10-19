@@ -30,8 +30,11 @@ struct LargeWidgetView: View {
             // 上部: 時刻・日付セクション
             timeSection(displaySettings: displaySettings, themeSettings: themeSettings)
 
-            Divider()
-                .padding(.vertical, 12)
+            // 区切り線（時刻・日付が表示されていて、かつshowDividerがtrueの場合のみ表示）
+            if displaySettings.showDivider && (displaySettings.showTime || displaySettings.showDate) {
+                Divider()
+                    .padding(.vertical, 12)
+            }
 
             // 下部: ペット情報セクション
             petInfoSection(pet: pet, displaySettings: displaySettings, themeSettings: themeSettings)

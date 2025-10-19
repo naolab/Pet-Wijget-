@@ -7,6 +7,7 @@ struct DisplaySettings: Codable {
     var showHumanAge: Bool
     var showTime: Bool
     var showDate: Bool
+    var showDivider: Bool
 
     // 時刻・日付フォーマット
     var use24HourFormat: Bool
@@ -25,6 +26,7 @@ struct DisplaySettings: Codable {
             showHumanAge: true,
             showTime: true,
             showDate: true,
+            showDivider: true,
             use24HourFormat: true,
             dateFormat: .yearMonthDay,
             nameFontSize: 16,
