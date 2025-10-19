@@ -46,8 +46,11 @@ struct MediumWidgetView: View {
                         .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.7))
                 }
 
-                Divider()
-                    .padding(.vertical, 4)
+                // 区切り線（時刻・日付が表示されていて、かつshowDividerがtrueの場合のみ表示）
+                if displaySettings.showDivider && (displaySettings.showTime || displaySettings.showDate) {
+                    Divider()
+                        .padding(.vertical, 4)
+                }
 
                 // ペット名
                 if displaySettings.showName {

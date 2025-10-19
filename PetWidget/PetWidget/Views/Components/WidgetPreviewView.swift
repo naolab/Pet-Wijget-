@@ -120,8 +120,11 @@ struct WidgetPreviewView: View {
                         .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.7))
                 }
 
-                Divider()
-                    .padding(.vertical, 4)
+                // 区切り線（時刻・日付が表示されていて、かつshowDividerがtrueの場合のみ表示）
+                if displaySettings.showDivider && (displaySettings.showTime || displaySettings.showDate) {
+                    Divider()
+                        .padding(.vertical, 4)
+                }
 
                 // ペット名
                 if displaySettings.showName {
@@ -173,7 +176,10 @@ struct WidgetPreviewView: View {
                 }
             }
 
-            Divider()
+            // 区切り線（時刻・日付が表示されていて、かつshowDividerがtrueの場合のみ表示）
+            if displaySettings.showDivider && (displaySettings.showTime || displaySettings.showDate) {
+                Divider()
+            }
 
             // 中央: ペット写真
             petPhotoView(photoData: pet.photoData, frameType: themeSettings.photoFrameType, size: 140)

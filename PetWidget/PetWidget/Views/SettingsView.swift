@@ -124,8 +124,15 @@ struct SettingsView: View {
                 .onChange(of: viewModel.widgetSettings.displaySettings.showDate) { _, _ in
                     viewModel.saveSettings()
                 }
+
+            Toggle("区切り線を表示", isOn: $viewModel.widgetSettings.displaySettings.showDivider)
+                .onChange(of: viewModel.widgetSettings.displaySettings.showDivider) { _, _ in
+                    viewModel.saveSettings()
+                }
         } header: {
             Text("表示項目")
+        } footer: {
+            Text("時刻・日付が両方非表示の場合、区切り線は自動的に非表示になります")
         }
     }
 
