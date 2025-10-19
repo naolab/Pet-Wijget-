@@ -10,6 +10,8 @@ struct PetDetailView: View {
     @State private var name: String = ""
     @State private var birthDate: Date = Date()
     @State private var selectedSpecies: PetType = .dog
+    @State private var selectedDogBreed: DogBreed?
+    @State private var selectedCatBreed: CatBreed?
     @State private var photoData: Data?
 
     @State private var selectedPhotoItem: PhotosPickerItem?
@@ -31,6 +33,7 @@ struct PetDetailView: View {
                         in: ...Date(),
                         displayedComponents: .date
                     )
+                    .environment(\.locale, Locale(identifier: "ja_JP"))
 
                     Picker("種別", selection: $selectedSpecies) {
                         ForEach(PetType.allCases, id: \.self) { type in
@@ -39,6 +42,57 @@ struct PetDetailView: View {
                                 Text(displayNameForSpecies(type))
                             }
                             .tag(type)
+                        }
+                    }
+                    .onChange(of: selectedSpecies) { _, newValue in
+                        // 種別が変更されたら品種をクリア
+                        if newValue != .dog {
+                            selectedDogBreed = nil
+                        }
+                        if newValue != .cat {
+                            selectedCatBreed = nil
+                        }
+                    }
+
+                    // 犬の場合のみ犬種選択を表示
+                    if selectedSpecies == .dog {
+                        Picker("犬種", selection: $selectedDogBreed) {
+                            Text("選択してください").tag(nil as DogBreed?)
+
+                            Section(header: Text("小型犬")) {
+                                ForEach(DogBreed.smallBreeds, id: \.self) { breed in
+                                    Text(breed.displayName).tag(breed as DogBreed?)
+                                }
+                            }
+
+                            Section(header: Text("中型犬")) {
+                                ForEach(DogBreed.mediumBreeds, id: \.self) { breed in
+                                    Text(breed.displayName).tag(breed as DogBreed?)
+                                }
+                            }
+
+                            Section(header: Text("大型犬")) {
+                                ForEach(DogBreed.largeBreeds, id: \.self) { breed in
+                                    Text(breed.displayName).tag(breed as DogBreed?)
+                                }
+                            }
+
+                            Section(header: Text("その他")) {
+                                ForEach(DogBreed.otherBreeds, id: \.self) { breed in
+                                    Text(breed.displayName).tag(breed as DogBreed?)
+                                }
+                            }
+                        }
+                    }
+
+                    // 猫の場合のみ猫種選択を表示
+                    if selectedSpecies == .cat {
+                        Picker("猫種", selection: $selectedCatBreed) {
+                            Text("選択してください").tag(nil as CatBreed?)
+
+                            ForEach(CatBreed.allCases, id: \.self) { breed in
+                                Text(breed.displayName).tag(breed as CatBreed?)
+                            }
                         }
                     }
                 }
@@ -105,12 +159,39 @@ struct PetDetailView: View {
                     birthDate = pet.birthDate
                     selectedSpecies = pet.species
                     photoData = pet.photoData
+
+                    // 品種の読み込み
+                    if let breedString = pet.breed {
+                        switch pet.species {
+                        case .dog:
+                            if let breed = DogBreed(rawValue: breedString) {
+                                selectedDogBreed = breed
+                            }
+                        case .cat:
+                            if let breed = CatBreed(rawValue: breedString) {
+                                selectedCatBreed = breed
+                            }
+                        default:
+                            break
+                        }
+                    }
                 }
             }
         }
     }
 
     private func savePet() {
+        // 選択された品種の取得
+        let breedString: String?
+        switch selectedSpecies {
+        case .dog:
+            breedString = selectedDogBreed?.rawValue
+        case .cat:
+            breedString = selectedCatBreed?.rawValue
+        default:
+            breedString = nil
+        }
+
         let newPet: Pet
         if let existingPet = pet {
             newPet = Pet(
@@ -118,14 +199,17 @@ struct PetDetailView: View {
                 name: name,
                 birthDate: birthDate,
                 species: selectedSpecies,
-                photoData: photoData
+                photoData: photoData,
+                displayOrder: existingPet.displayOrder,
+                breed: breedString
             )
         } else {
             newPet = Pet(
                 name: name,
                 birthDate: birthDate,
                 species: selectedSpecies,
-                photoData: photoData
+                photoData: photoData,
+                breed: breedString
             )
         }
 
@@ -151,12 +235,24 @@ struct PetDetailView: View {
     }
 
     private func createPreviewPet() -> Pet {
-        Pet(
+        // 選択された品種の取得
+        let breedString: String?
+        switch selectedSpecies {
+        case .dog:
+            breedString = selectedDogBreed?.rawValue
+        case .cat:
+            breedString = selectedCatBreed?.rawValue
+        default:
+            breedString = nil
+        }
+
+        return Pet(
             id: pet?.id ?? UUID(),
             name: name.isEmpty ? "名前未設定" : name,
             birthDate: birthDate,
             species: selectedSpecies,
-            photoData: photoData
+            photoData: photoData,
+            breed: breedString
         )
     }
 
@@ -164,7 +260,12 @@ struct PetDetailView: View {
         switch species {
         case .dog: return "pawprint.fill"
         case .cat: return "cat.fill"
-        case .other: return "hare.fill"
+        case .fish: return "fish.fill"
+        case .smallAnimal: return "hare.fill"
+        case .turtle: return "tortoise.fill"
+        case .bird: return "bird.fill"
+        case .insect: return "ladybug.fill"
+        case .other: return "questionmark.circle.fill"
         }
     }
 
@@ -172,6 +273,11 @@ struct PetDetailView: View {
         switch species {
         case .dog: return "犬"
         case .cat: return "猫"
+        case .fish: return "魚"
+        case .smallAnimal: return "小動物"
+        case .turtle: return "カメ"
+        case .bird: return "鳥"
+        case .insect: return "虫"
         case .other: return "その他"
         }
     }

@@ -1,26 +1,24 @@
 import Foundation
 
 final class HumanAgeConverter {
-    static func convert(pet: Pet) -> Int {
-        let realAge = Double(pet.ageInYears)
-
-        switch pet.species {
-        case .dog, .cat:
-            // 最初の2年は1年=12歳、以降は1年=4歳で計算
-            if realAge <= 2 {
-                return Int(realAge * 12)
-            } else {
-                return Int(24 + (realAge - 2) * 4)
-            }
-
-        case .other:
-            // その他は単純に5倍
-            return Int(realAge * 5)
-        }
+    /// ペットの実年齢を人間年齢に換算
+    /// - Parameters:
+    ///   - pet: 換算対象のペット
+    ///   - customLifespan: カスタム平均寿命（nilの場合はデフォルト値を使用）
+    /// - Returns: 人間年齢（歳）
+    static func convert(pet: Pet, customLifespan: Double? = nil) -> Int {
+        let profile = pet.species.ageConversionProfile
+        let realAge = pet.ageInYearsWithDecimals
+        return profile.calculateHumanAge(realAge: realAge, customLifespan: customLifespan)
     }
 
-    static func humanAgeString(for pet: Pet) -> String {
-        let humanAge = convert(pet: pet)
+    /// 人間年齢を文字列で返す
+    /// - Parameters:
+    ///   - pet: 対象のペット
+    ///   - customLifespan: カスタム平均寿命（nilの場合はデフォルト値を使用）
+    /// - Returns: "人間年齢: XX歳" 形式の文字列
+    static func humanAgeString(for pet: Pet, customLifespan: Double? = nil) -> String {
+        let humanAge = convert(pet: pet, customLifespan: customLifespan)
         return "人間年齢: \(humanAge)歳"
     }
 }

@@ -4,7 +4,6 @@ struct PetListView: View {
     @StateObject private var viewModel = PetListViewModel()
     @State private var showingAddPet = false
     @State private var selectedPet: Pet?
-    @State private var showingSettings = false
     @State private var editMode: EditMode = .inactive
 
     var body: some View {
@@ -21,12 +20,6 @@ struct PetListView: View {
             .navigationTitle("ペット一覧")
             .environment(\.editMode, $editMode)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: { showingSettings = true }) {
-                        Image(systemName: "gear")
-                    }
-                }
-
                 ToolbarItem(placement: .navigationBarTrailing) {
                     HStack(spacing: 16) {
                         // ソートメニュー
@@ -77,9 +70,6 @@ struct PetListView: View {
                     viewModel.updatePet(updatedPet)
                     selectedPet = nil
                 })
-            }
-            .sheet(isPresented: $showingSettings) {
-                SettingsView()
             }
             .alert("エラー", isPresented: .constant(viewModel.errorMessage != nil)) {
                 Button("OK") {
@@ -198,8 +188,18 @@ struct PetRowView: View {
             return "pawprint.fill"
         case .cat:
             return "cat.fill"
-        case .other:
+        case .fish:
+            return "fish.fill"
+        case .smallAnimal:
             return "hare.fill"
+        case .turtle:
+            return "tortoise.fill"
+        case .bird:
+            return "bird.fill"
+        case .insect:
+            return "ladybug.fill"
+        case .other:
+            return "questionmark.circle.fill"
         }
     }
 }

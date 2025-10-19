@@ -2,47 +2,73 @@ import SwiftUI
 
 struct SettingsView: View {
     @StateObject private var viewModel = SettingsViewModel()
-    @Environment(\.dismiss) var dismiss
+    @State private var selectedPreviewSize: WidgetPreviewView.WidgetSize = .medium
 
     var body: some View {
-        NavigationView {
-            Form {
-                // ペット選択セクション
-                petSelectionSection
+        Form {
+            // プレビューセクション
+            previewSection
 
-                // 表示項目セクション
-                displayItemsSection
+            // ペット選択セクション
+            petSelectionSection
 
-                // フォントサイズセクション
-                fontSizeSection
+            // 表示項目セクション
+            displayItemsSection
 
-                // 日付・時刻フォーマットセクション
-                dateTimeFormatSection
+            // レイアウトセクション
+            layoutSection
 
-                // テーマ設定セクション
-                themeSection
+            // フォントサイズセクション
+            fontSizeSection
 
-                // リセットセクション
-                resetSection
+            // 日付・時刻フォーマットセクション
+            dateTimeFormatSection
+
+            // テーマ設定セクション
+            themeSection
+
+            // リセットセクション
+            resetSection
+        }
+        .navigationTitle("ウィジェット設定")
+        .navigationBarTitleDisplayMode(.inline)
+        .alert("エラー", isPresented: .constant(viewModel.errorMessage != nil)) {
+            Button("OK") {
+                viewModel.errorMessage = nil
             }
-            .navigationTitle("ウィジェット設定")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("完了") {
-                        dismiss()
-                    }
-                }
+        } message: {
+            if let errorMessage = viewModel.errorMessage {
+                Text(errorMessage)
             }
-            .alert("エラー", isPresented: .constant(viewModel.errorMessage != nil)) {
-                Button("OK") {
-                    viewModel.errorMessage = nil
+        }
+    }
+
+    // MARK: - Preview Section
+    private var previewSection: some View {
+        Section {
+            VStack(spacing: 16) {
+                // サイズ選択
+                Picker("プレビューサイズ", selection: $selectedPreviewSize) {
+                    Text("小").tag(WidgetPreviewView.WidgetSize.small)
+                    Text("中").tag(WidgetPreviewView.WidgetSize.medium)
+                    Text("大").tag(WidgetPreviewView.WidgetSize.large)
                 }
-            } message: {
-                if let errorMessage = viewModel.errorMessage {
-                    Text(errorMessage)
-                }
+                .pickerStyle(.segmented)
+                .padding(.horizontal)
+
+                // プレビュー表示
+                let selectedPet = viewModel.getSelectedPet()
+                WidgetPreviewView(
+                    pet: selectedPet,
+                    settings: viewModel.widgetSettings,
+                    widgetSize: selectedPreviewSize
+                )
+                .padding(.vertical, 8)
             }
+        } header: {
+            Text("プレビュー")
+        } footer: {
+            Text("設定の変更がリアルタイムで反映されます")
         }
     }
 
@@ -101,8 +127,34 @@ struct SettingsView: View {
                 .onChange(of: viewModel.widgetSettings.displaySettings.showDate) { _, _ in
                     viewModel.saveSettings()
                 }
+
+            Toggle("区切り線を表示", isOn: $viewModel.widgetSettings.displaySettings.showDivider)
+                .onChange(of: viewModel.widgetSettings.displaySettings.showDivider) { _, _ in
+                    viewModel.saveSettings()
+                }
         } header: {
             Text("表示項目")
+        } footer: {
+            Text("時刻・日付が両方非表示の場合、区切り線は自動的に非表示になります")
+        }
+    }
+
+    // MARK: - Layout Section
+    private var layoutSection: some View {
+        Section {
+            Picker("テキスト配置", selection: $viewModel.widgetSettings.displaySettings.textAlignment) {
+                ForEach(TextAlignmentType.allCases, id: \.self) { alignment in
+                    Text(alignment.displayName).tag(alignment)
+                }
+            }
+            .pickerStyle(.segmented)
+            .onChange(of: viewModel.widgetSettings.displaySettings.textAlignment) { _, _ in
+                viewModel.saveSettings()
+            }
+        } header: {
+            Text("レイアウト")
+        } footer: {
+            Text("ウィジェット内のテキストの配置を変更します")
         }
     }
 
@@ -228,5 +280,7 @@ struct SettingsView: View {
 }
 
 #Preview {
-    SettingsView()
+    NavigationView {
+        SettingsView()
+    }
 }

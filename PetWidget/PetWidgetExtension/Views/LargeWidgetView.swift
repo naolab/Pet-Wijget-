@@ -5,10 +5,19 @@ struct LargeWidgetView: View {
     let entry: PetWidgetEntry
 
     var body: some View {
-        if let pet = entry.pet {
-            petContentView(pet: pet)
-        } else {
-            emptyStateView
+        Group {
+            if let pet = entry.pet {
+                petContentView(pet: pet)
+            } else {
+                emptyStateView
+            }
+        }
+        .containerBackground(for: .widget) {
+            if let pet = entry.pet {
+                backgroundView(themeSettings: entry.settings.themeSettings)
+            } else {
+                Color.gray.opacity(0.1)
+            }
         }
     }
 
@@ -17,24 +26,22 @@ struct LargeWidgetView: View {
         let displaySettings = settings.displaySettings
         let themeSettings = settings.themeSettings
 
-        return ZStack {
-            // 背景
-            backgroundView(themeSettings: themeSettings)
+        return VStack(spacing: 0) {
+            // 上部: 時刻・日付セクション
+            timeSection(displaySettings: displaySettings, themeSettings: themeSettings)
 
-            VStack(spacing: 0) {
-                // 上部: 時刻・日付セクション
-                timeSection(displaySettings: displaySettings, themeSettings: themeSettings)
-
+            // 区切り線（時刻・日付が表示されていて、かつshowDividerがtrueの場合のみ表示）
+            if displaySettings.showDivider && (displaySettings.showTime || displaySettings.showDate) {
                 Divider()
                     .padding(.vertical, 12)
-
-                // 下部: ペット情報セクション
-                petInfoSection(pet: pet, displaySettings: displaySettings, themeSettings: themeSettings)
-
-                Spacer()
             }
-            .padding(16)
+
+            // 下部: ペット情報セクション
+            petInfoSection(pet: pet, displaySettings: displaySettings, themeSettings: themeSettings)
+
+            Spacer()
         }
+        .padding(16)
     }
 
     private func backgroundView(themeSettings: ThemeSettings) -> some View {
@@ -79,6 +86,7 @@ struct LargeWidgetView: View {
                     .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.7))
             }
         }
+        .frame(maxWidth: .infinity, alignment: displaySettings.textAlignment.alignment)
     }
 
     // MARK: - ペット情報セクション
@@ -88,7 +96,7 @@ struct LargeWidgetView: View {
             petPhotoView(photoData: pet.photoData, frameType: themeSettings.photoFrameType)
 
             // 右側: 詳細情報
-            VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: displaySettings.textAlignment.horizontalAlignment, spacing: 12) {
                 // ペット名
                 if displaySettings.showName {
                     HStack(spacing: 6) {
@@ -112,7 +120,7 @@ struct LargeWidgetView: View {
                 }
 
                 // 年齢情報
-                VStack(alignment: .leading, spacing: 6) {
+                VStack(alignment: displaySettings.textAlignment.horizontalAlignment, spacing: 6) {
                     if displaySettings.showAge {
                         HStack(spacing: 4) {
                             Image(systemName: "calendar.badge.clock")
@@ -136,6 +144,7 @@ struct LargeWidgetView: View {
                     }
                 }
             }
+            .frame(maxWidth: .infinity, alignment: displaySettings.textAlignment.alignment)
 
             Spacer()
         }
@@ -265,7 +274,12 @@ struct LargeWidgetView: View {
         switch species {
         case .dog: return "pawprint.fill"
         case .cat: return "cat.fill"
-        case .other: return "hare.fill"
+        case .fish: return "fish.fill"
+        case .smallAnimal: return "hare.fill"
+        case .turtle: return "tortoise.fill"
+        case .bird: return "bird.fill"
+        case .insect: return "ladybug.fill"
+        case .other: return "questionmark.circle.fill"
         }
     }
 }

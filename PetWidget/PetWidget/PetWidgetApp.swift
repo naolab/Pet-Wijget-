@@ -32,7 +32,7 @@ struct PetWidgetApp: App {
                 }
                 .padding()
             } else if let viewContext = try? coreDataStack.viewContext {
-                PetListView()
+                MainTabView()
                     .environment(\.managedObjectContext, viewContext)
             } else {
                 VStack(spacing: 20) {
