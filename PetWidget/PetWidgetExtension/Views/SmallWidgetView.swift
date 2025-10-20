@@ -13,7 +13,7 @@ struct SmallWidgetView: View {
             }
         }
         .containerBackground(for: .widget) {
-            if let pet = entry.pet {
+            if entry.pet != nil {
                 backgroundView(themeSettings: entry.settings.themeSettings)
             } else {
                 Color.gray.opacity(0.1)
