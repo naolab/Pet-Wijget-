@@ -24,21 +24,28 @@ struct PhotoCropperView: View {
                 VStack(spacing: 0) {
                     // ヘッダー
                     HStack {
-                        Button("キャンセル") {
+                        Button(action: {
                             onCancel()
+                        }) {
+                            Text("キャンセル")
+                                .foregroundColor(.white)
+                                .padding()
                         }
-                        .foregroundColor(.white)
 
                         Spacer()
 
-                        Button("完了") {
+                        Button(action: {
                             cropAndComplete()
+                        }) {
+                            Text("完了")
+                                .foregroundColor(.white)
+                                .fontWeight(.semibold)
+                                .padding()
                         }
-                        .foregroundColor(.white)
-                        .fontWeight(.semibold)
                     }
-                    .padding()
-                    .background(Color.black.opacity(0.5))
+                    .padding(.horizontal)
+                    .background(Color.black.opacity(0.8))
+                    .frame(height: 60)
 
                     Spacer()
 
