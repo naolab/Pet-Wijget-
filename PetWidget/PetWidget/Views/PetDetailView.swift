@@ -14,6 +14,13 @@ struct PetDetailView: View {
     @State private var photoData: Data?
     @State private var originalPhotoData: Data?
 
+    // 定数定義
+    private enum Constants {
+        static let fullScreenTransitionDelay: TimeInterval = 0.3
+        static let originalImageMaxSize: CGFloat = 2000
+        static let originalImageCompressionQuality: CGFloat = 0.9
+    }
+
     // フルスクリーン表示の状態管理用
     enum FullScreenState: Identifiable {
         case imagePicker
@@ -30,6 +37,14 @@ struct PetDetailView: View {
 
     var isEditing: Bool {
         pet != nil
+    }
+
+    private var currentBreedString: String? {
+        switch selectedSpecies {
+        case .dog: return selectedDogBreed?.rawValue
+        case .cat: return selectedCatBreed?.rawValue
+        default: return nil
+        }
     }
 
     var body: some View {
@@ -182,11 +197,11 @@ struct PetDetailView: View {
                         // 元画像を保存
                         originalPhotoData = PhotoManager.shared.processImage(
                             image,
-                            maxSize: 2000,
-                            compressionQuality: 0.9
+                            maxSize: Constants.originalImageMaxSize,
+                            compressionQuality: Constants.originalImageCompressionQuality
                         )
                         // 編集画面を表示（少し遅延させてfullScreenCoverの完全な閉じを待つ）
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + Constants.fullScreenTransitionDelay) {
                             fullScreenState = .photoCropper(image)
                         }
                     }
@@ -237,17 +252,6 @@ struct PetDetailView: View {
     }
 
     private func savePet() {
-        // 選択された品種の取得
-        let breedString: String?
-        switch selectedSpecies {
-        case .dog:
-            breedString = selectedDogBreed?.rawValue
-        case .cat:
-            breedString = selectedCatBreed?.rawValue
-        default:
-            breedString = nil
-        }
-
         let newPet: Pet
         if let existingPet = pet {
             newPet = Pet(
@@ -258,7 +262,7 @@ struct PetDetailView: View {
                 photoData: photoData,
                 originalPhotoData: originalPhotoData,
                 displayOrder: existingPet.displayOrder,
-                breed: breedString
+                breed: currentBreedString
             )
         } else {
             newPet = Pet(
@@ -267,7 +271,7 @@ struct PetDetailView: View {
                 species: selectedSpecies,
                 photoData: photoData,
                 originalPhotoData: originalPhotoData,
-                breed: breedString
+                breed: currentBreedString
             )
         }
 
@@ -276,24 +280,13 @@ struct PetDetailView: View {
     }
 
     private func createPreviewPet() -> Pet {
-        // 選択された品種の取得
-        let breedString: String?
-        switch selectedSpecies {
-        case .dog:
-            breedString = selectedDogBreed?.rawValue
-        case .cat:
-            breedString = selectedCatBreed?.rawValue
-        default:
-            breedString = nil
-        }
-
         return Pet(
             id: pet?.id ?? UUID(),
             name: name.isEmpty ? "名前未設定" : name,
             birthDate: birthDate,
             species: selectedSpecies,
             photoData: photoData,
-            breed: breedString
+            breed: currentBreedString
         )
     }
 
