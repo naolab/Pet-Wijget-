@@ -122,6 +122,10 @@ struct PetDetailView: View {
 
                         Button {
                             print("DEBUG: 写真を選択ボタンが押されました")
+                            guard fullScreenState == nil else {
+                                print("DEBUG: 既に状態が設定されているため無視")
+                                return
+                            }
                             fullScreenState = .imagePicker
                         } label: {
                             Label("写真を選択", systemImage: "photo.on.rectangle")
@@ -131,6 +135,7 @@ struct PetDetailView: View {
                                 .foregroundColor(.blue)
                                 .cornerRadius(10)
                         }
+                        .buttonStyle(.plain)
 
                         // 既存の写真がある場合は再編集ボタンを表示
                         if let originalData = originalPhotoData,
@@ -138,6 +143,10 @@ struct PetDetailView: View {
                             Button {
                                 print("DEBUG: 写真を編集ボタンが押されました")
                                 print("DEBUG: originalImage exists: \(originalImage)")
+                                guard fullScreenState == nil else {
+                                    print("DEBUG: 既に状態が設定されているため無視")
+                                    return
+                                }
                                 fullScreenState = .photoCropper(originalImage)
                             } label: {
                                 Label("写真を編集", systemImage: "crop.rotate")
@@ -147,6 +156,7 @@ struct PetDetailView: View {
                                     .foregroundColor(.green)
                                     .cornerRadius(10)
                             }
+                            .buttonStyle(.plain)
                         }
                     }
                     .frame(maxWidth: .infinity)
