@@ -47,6 +47,11 @@ struct PetDetailView: View {
         }
     }
 
+    private func setFullScreenState(_ state: FullScreenState) {
+        guard fullScreenState == nil else { return }
+        fullScreenState = state
+    }
+
     var body: some View {
         NavigationView {
             Form {
@@ -132,10 +137,7 @@ struct PetDetailView: View {
                         )
 
                         Button {
-                            guard fullScreenState == nil else {
-                                return
-                            }
-                            fullScreenState = .imagePicker
+                            setFullScreenState(.imagePicker)
                         } label: {
                             Label("写真を選択", systemImage: "photo.on.rectangle")
                                 .frame(maxWidth: .infinity)
@@ -150,10 +152,7 @@ struct PetDetailView: View {
                         if let originalData = originalPhotoData,
                            let originalImage = UIImage(data: originalData) {
                             Button {
-                                guard fullScreenState == nil else {
-                                    return
-                                }
-                                fullScreenState = .photoCropper(originalImage)
+                                setFullScreenState(.photoCropper(originalImage))
                             } label: {
                                 Label("写真を編集", systemImage: "crop.rotate")
                                     .frame(maxWidth: .infinity)
