@@ -18,6 +18,20 @@ struct PetDetailView: View {
     @State private var showingPhotoCropper = false
     @State private var selectedImage: UIImage?
 
+    // フルスクリーン表示の状態管理用
+    enum FullScreenState: Identifiable {
+        case imagePicker
+        case photoCropper(UIImage)
+
+        var id: String {
+            switch self {
+            case .imagePicker: return "imagePicker"
+            case .photoCropper: return "photoCropper"
+            }
+        }
+    }
+    @State private var fullScreenState: FullScreenState?
+
     var isEditing: Bool {
         pet != nil
     }
@@ -107,7 +121,8 @@ struct PetDetailView: View {
                         )
 
                         Button {
-                            showingImagePicker = true
+                            print("DEBUG: 写真を選択ボタンが押されました")
+                            fullScreenState = .imagePicker
                         } label: {
                             Label("写真を選択", systemImage: "photo.on.rectangle")
                                 .frame(maxWidth: .infinity)
@@ -121,8 +136,9 @@ struct PetDetailView: View {
                         if let originalData = originalPhotoData,
                            let originalImage = UIImage(data: originalData) {
                             Button {
-                                selectedImage = originalImage
-                                showingPhotoCropper = true
+                                print("DEBUG: 写真を編集ボタンが押されました")
+                                print("DEBUG: originalImage exists: \(originalImage)")
+                                fullScreenState = .photoCropper(originalImage)
                             } label: {
                                 Label("写真を編集", systemImage: "crop.rotate")
                                     .frame(maxWidth: .infinity)
@@ -158,35 +174,48 @@ struct PetDetailView: View {
                     .disabled(name.isEmpty)
                 }
             }
-            .sheet(isPresented: $showingImagePicker) {
-                ImagePicker { image in
-                    // 元画像を保存
-                    originalPhotoData = PhotoManager.shared.processImage(
-                        image,
-                        maxSize: 2000,
-                        compressionQuality: 0.9
-                    )
-                    // 編集画面を表示
-                    selectedImage = image
-                    showingPhotoCropper = true
-                }
-            }
-            .fullScreenCover(isPresented: $showingPhotoCropper) {
-                if let image = selectedImage {
+            .fullScreenCover(item: $fullScreenState) { state in
+                switch state {
+                case .imagePicker:
+                    ImagePicker { image in
+                        print("DEBUG: ImagePicker - 画像が選択されました")
+                        // 元画像を保存
+                        originalPhotoData = PhotoManager.shared.processImage(
+                            image,
+                            maxSize: 2000,
+                            compressionQuality: 0.9
+                        )
+                        // 編集画面を表示（少し遅延させてfullScreenCoverの完全な閉じを待つ）
+                        print("DEBUG: ImagePicker - 0.3秒後にPhotoCropperを開きます")
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            print("DEBUG: ImagePicker - fullScreenState = .photoCropper を設定")
+                            fullScreenState = .photoCropper(image)
+                        }
+                    }
+                    .onAppear {
+                        print("DEBUG: ImagePicker が表示されました")
+                    }
+
+                case .photoCropper(let image):
                     PhotoCropperView(
                         image: image,
                         onComplete: { croppedImage in
+                            print("DEBUG: PhotoCropperView - 完了ボタンが押されました")
                             // 切り抜いた画像を保存
                             photoData = PhotoManager.shared.processImage(
                                 croppedImage,
                                 maxSize: AppConfig.maxImageSize
                             )
-                            showingPhotoCropper = false
+                            fullScreenState = nil
                         },
                         onCancel: {
-                            showingPhotoCropper = false
+                            print("DEBUG: PhotoCropperView - キャンセルボタンが押されました")
+                            fullScreenState = nil
                         }
                     )
+                    .onAppear {
+                        print("DEBUG: PhotoCropperView が表示されました (image: \(image.size))")
+                    }
                 }
             }
             .onAppear {
