@@ -14,10 +14,6 @@ struct PetDetailView: View {
     @State private var photoData: Data?
     @State private var originalPhotoData: Data?
 
-    @State private var showingImagePicker = false
-    @State private var showingPhotoCropper = false
-    @State private var selectedImage: UIImage?
-
     // フルスクリーン表示の状態管理用
     enum FullScreenState: Identifiable {
         case imagePicker
@@ -121,9 +117,7 @@ struct PetDetailView: View {
                         )
 
                         Button {
-                            print("DEBUG: 写真を選択ボタンが押されました")
                             guard fullScreenState == nil else {
-                                print("DEBUG: 既に状態が設定されているため無視")
                                 return
                             }
                             fullScreenState = .imagePicker
@@ -141,10 +135,7 @@ struct PetDetailView: View {
                         if let originalData = originalPhotoData,
                            let originalImage = UIImage(data: originalData) {
                             Button {
-                                print("DEBUG: 写真を編集ボタンが押されました")
-                                print("DEBUG: originalImage exists: \(originalImage)")
                                 guard fullScreenState == nil else {
-                                    print("DEBUG: 既に状態が設定されているため無視")
                                     return
                                 }
                                 fullScreenState = .photoCropper(originalImage)
@@ -188,7 +179,6 @@ struct PetDetailView: View {
                 switch state {
                 case .imagePicker:
                     ImagePicker { image in
-                        print("DEBUG: ImagePicker - 画像が選択されました")
                         // 元画像を保存
                         originalPhotoData = PhotoManager.shared.processImage(
                             image,
@@ -196,21 +186,15 @@ struct PetDetailView: View {
                             compressionQuality: 0.9
                         )
                         // 編集画面を表示（少し遅延させてfullScreenCoverの完全な閉じを待つ）
-                        print("DEBUG: ImagePicker - 0.3秒後にPhotoCropperを開きます")
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                            print("DEBUG: ImagePicker - fullScreenState = .photoCropper を設定")
                             fullScreenState = .photoCropper(image)
                         }
-                    }
-                    .onAppear {
-                        print("DEBUG: ImagePicker が表示されました")
                     }
 
                 case .photoCropper(let image):
                     PhotoCropperView(
                         image: image,
                         onComplete: { croppedImage in
-                            print("DEBUG: PhotoCropperView - 完了ボタンが押されました")
                             // 切り抜いた画像を保存
                             photoData = PhotoManager.shared.processImage(
                                 croppedImage,
@@ -219,13 +203,9 @@ struct PetDetailView: View {
                             fullScreenState = nil
                         },
                         onCancel: {
-                            print("DEBUG: PhotoCropperView - キャンセルボタンが押されました")
                             fullScreenState = nil
                         }
                     )
-                    .onAppear {
-                        print("DEBUG: PhotoCropperView が表示されました (image: \(image.size))")
-                    }
                 }
             }
             .onAppear {
