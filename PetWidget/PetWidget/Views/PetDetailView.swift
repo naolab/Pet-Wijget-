@@ -1,5 +1,4 @@
 import SwiftUI
-import PhotosUI
 
 struct PetDetailView: View {
     let pet: Pet?
@@ -13,9 +12,11 @@ struct PetDetailView: View {
     @State private var selectedDogBreed: DogBreed?
     @State private var selectedCatBreed: CatBreed?
     @State private var photoData: Data?
+    @State private var originalPhotoData: Data?
 
-    @State private var selectedPhotoItem: PhotosPickerItem?
-    @State private var isLoadingPhoto = false
+    @State private var showingImagePicker = false
+    @State private var showingPhotoCropper = false
+    @State private var selectedImage: UIImage?
 
     var isEditing: Bool {
         pet != nil
@@ -99,28 +100,37 @@ struct PetDetailView: View {
 
                 Section("写真") {
                     VStack(spacing: 16) {
-                        if isLoadingPhoto {
-                            ProgressView()
-                                .frame(width: 150, height: 150)
-                        } else {
-                            PetPhotoView(
-                                photoData: photoData,
-                                size: 150,
-                                shape: .roundedRectangle(cornerRadius: 16)
-                            )
-                        }
+                        PetPhotoView(
+                            photoData: photoData,
+                            size: 150,
+                            shape: .roundedRectangle(cornerRadius: 16)
+                        )
 
-                        PhotosPicker(
-                            selection: $selectedPhotoItem,
-                            matching: .images,
-                            photoLibrary: .shared()
-                        ) {
+                        Button {
+                            showingImagePicker = true
+                        } label: {
                             Label("写真を選択", systemImage: "photo.on.rectangle")
                                 .frame(maxWidth: .infinity)
                                 .padding()
                                 .background(Color.blue.opacity(0.1))
                                 .foregroundColor(.blue)
                                 .cornerRadius(10)
+                        }
+
+                        // 既存の写真がある場合は再編集ボタンを表示
+                        if let originalData = originalPhotoData,
+                           let originalImage = UIImage(data: originalData) {
+                            Button {
+                                selectedImage = originalImage
+                                showingPhotoCropper = true
+                            } label: {
+                                Label("写真を編集", systemImage: "crop.rotate")
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(Color.green.opacity(0.1))
+                                    .foregroundColor(.green)
+                                    .cornerRadius(10)
+                            }
                         }
                     }
                     .frame(maxWidth: .infinity)
@@ -148,9 +158,35 @@ struct PetDetailView: View {
                     .disabled(name.isEmpty)
                 }
             }
-            .onChange(of: selectedPhotoItem) { _, newItem in
-                Task {
-                    await loadPhoto(from: newItem)
+            .sheet(isPresented: $showingImagePicker) {
+                ImagePicker { image in
+                    // 元画像を保存
+                    originalPhotoData = PhotoManager.shared.processImage(
+                        image,
+                        maxSize: 2000,
+                        compressionQuality: 0.9
+                    )
+                    // 編集画面を表示
+                    selectedImage = image
+                    showingPhotoCropper = true
+                }
+            }
+            .fullScreenCover(isPresented: $showingPhotoCropper) {
+                if let image = selectedImage {
+                    PhotoCropperView(
+                        image: image,
+                        onComplete: { croppedImage in
+                            // 切り抜いた画像を保存
+                            photoData = PhotoManager.shared.processImage(
+                                croppedImage,
+                                maxSize: AppConfig.maxImageSize
+                            )
+                            showingPhotoCropper = false
+                        },
+                        onCancel: {
+                            showingPhotoCropper = false
+                        }
+                    )
                 }
             }
             .onAppear {
@@ -159,6 +195,7 @@ struct PetDetailView: View {
                     birthDate = pet.birthDate
                     selectedSpecies = pet.species
                     photoData = pet.photoData
+                    originalPhotoData = pet.originalPhotoData
 
                     // 品種の読み込み
                     if let breedString = pet.breed {
@@ -200,6 +237,7 @@ struct PetDetailView: View {
                 birthDate: birthDate,
                 species: selectedSpecies,
                 photoData: photoData,
+                originalPhotoData: originalPhotoData,
                 displayOrder: existingPet.displayOrder,
                 breed: breedString
             )
@@ -209,29 +247,13 @@ struct PetDetailView: View {
                 birthDate: birthDate,
                 species: selectedSpecies,
                 photoData: photoData,
+                originalPhotoData: originalPhotoData,
                 breed: breedString
             )
         }
 
         onSave(newPet)
         dismiss()
-    }
-
-    private func loadPhoto(from item: PhotosPickerItem?) async {
-        guard let item = item else { return }
-
-        isLoadingPhoto = true
-        defer { isLoadingPhoto = false }
-
-        do {
-            if let data = try await item.loadTransferable(type: Data.self),
-               let image = UIImage(data: data) {
-                // PhotoManagerを使って画像をリサイズ
-                photoData = PhotoManager.shared.processImage(image, maxSize: AppConfig.maxImageSize)
-            }
-        } catch {
-            print("写真の読み込みに失敗: \(error)")
-        }
     }
 
     private func createPreviewPet() -> Pet {
