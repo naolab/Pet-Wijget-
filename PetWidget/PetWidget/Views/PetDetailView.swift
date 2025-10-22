@@ -64,8 +64,8 @@ struct PetDetailView: View {
                     Picker("種別", selection: $selectedSpecies) {
                         ForEach(PetType.allCases, id: \.self) { type in
                             HStack {
-                                Image(systemName: iconForSpecies(type))
-                                Text(displayNameForSpecies(type))
+                                Image(systemName: type.systemIcon)
+                                Text(type.displayName)
                             }
                             .tag(type)
                         }
@@ -290,31 +290,6 @@ struct PetDetailView: View {
         )
     }
 
-    private func iconForSpecies(_ species: PetType) -> String {
-        switch species {
-        case .dog: return "pawprint.fill"
-        case .cat: return "cat.fill"
-        case .fish: return "fish.fill"
-        case .smallAnimal: return "hare.fill"
-        case .turtle: return "tortoise.fill"
-        case .bird: return "bird.fill"
-        case .insect: return "ladybug.fill"
-        case .other: return "questionmark.circle.fill"
-        }
-    }
-
-    private func displayNameForSpecies(_ species: PetType) -> String {
-        switch species {
-        case .dog: return "犬"
-        case .cat: return "猫"
-        case .fish: return "魚"
-        case .smallAnimal: return "小動物"
-        case .turtle: return "カメ"
-        case .bird: return "鳥"
-        case .insect: return "虫"
-        case .other: return "その他"
-        }
-    }
 }
 
 #Preview {
