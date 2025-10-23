@@ -5,6 +5,8 @@ struct PetListView: View {
     @State private var showingAddPet = false
     @State private var selectedPet: Pet?
     @State private var editMode: EditMode = .inactive
+    @State private var petToDelete: Pet?
+    @State private var showingDeleteAlert = false
 
     var body: some View {
         NavigationView {
@@ -80,6 +82,21 @@ struct PetListView: View {
                     Text(errorMessage)
                 }
             }
+            .alert("ペットを削除", isPresented: $showingDeleteAlert) {
+                Button("キャンセル", role: .cancel) {
+                    petToDelete = nil
+                }
+                Button("削除", role: .destructive) {
+                    if let pet = petToDelete {
+                        viewModel.deletePet(pet)
+                    }
+                    petToDelete = nil
+                }
+            } message: {
+                if let pet = petToDelete {
+                    Text("\(pet.name)を削除してもよろしいですか？")
+                }
+            }
             .onAppear {
                 viewModel.loadPets()
             }
@@ -138,7 +155,10 @@ struct PetListView: View {
                 Button(action: { selectedPet = pet }) {
                     Label("編集", systemImage: "pencil")
                 }
-                Button(role: .destructive, action: { viewModel.deletePet(pet) }) {
+                Button(role: .destructive, action: {
+                    petToDelete = pet
+                    showingDeleteAlert = true
+                }) {
                     Label("削除", systemImage: "trash")
                 }
             }

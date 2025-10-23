@@ -6,6 +6,7 @@ struct Pet: Identifiable, Codable, Equatable {
     var birthDate: Date
     var species: PetType
     var photoData: Data?
+    var originalPhotoData: Data?  // トリミング前の元画像（再編集用）
     var createdAt: Date
     var updatedAt: Date
     var displayOrder: Int
@@ -17,6 +18,7 @@ struct Pet: Identifiable, Codable, Equatable {
         birthDate: Date,
         species: PetType,
         photoData: Data? = nil,
+        originalPhotoData: Data? = nil,
         displayOrder: Int = 0,
         breed: String? = nil
     ) {
@@ -25,6 +27,7 @@ struct Pet: Identifiable, Codable, Equatable {
         self.birthDate = birthDate
         self.species = species
         self.photoData = photoData
+        self.originalPhotoData = originalPhotoData
         self.createdAt = Date()
         self.updatedAt = Date()
         self.displayOrder = displayOrder

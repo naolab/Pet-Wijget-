@@ -124,8 +124,10 @@ final class PetDataManager: PetDataManagerProtocol {
         }
 
         let photoData = entity.value(forKey: "photoData") as? Data
+        let originalPhotoData = entity.value(forKey: "originalPhotoData") as? Data
         let displayOrder = entity.value(forKey: "displayOrder") as? Int ?? 0
         let updatedAt = entity.value(forKey: "updatedAt") as? Date ?? createdAt
+        let breed = entity.value(forKey: "breed") as? String
 
         var pet = Pet(
             id: id,
@@ -133,7 +135,9 @@ final class PetDataManager: PetDataManagerProtocol {
             birthDate: birthDate,
             species: species,
             photoData: photoData,
-            displayOrder: displayOrder
+            originalPhotoData: originalPhotoData,
+            displayOrder: displayOrder,
+            breed: breed
         )
         pet.createdAt = createdAt
         pet.updatedAt = updatedAt
@@ -147,8 +151,10 @@ final class PetDataManager: PetDataManagerProtocol {
         entity.setValue(pet.birthDate, forKey: "birthDate")
         entity.setValue(pet.species.rawValue, forKey: "species")
         entity.setValue(pet.photoData, forKey: "photoData")
+        entity.setValue(pet.originalPhotoData, forKey: "originalPhotoData")
         entity.setValue(pet.createdAt, forKey: "createdAt")
         entity.setValue(Date(), forKey: "updatedAt")
         entity.setValue(pet.displayOrder, forKey: "displayOrder")
+        entity.setValue(pet.breed, forKey: "breed")
     }
 }
