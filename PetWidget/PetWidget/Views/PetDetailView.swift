@@ -1,5 +1,4 @@
 import SwiftUI
-import PhotosUI
 
 struct PetDetailView: View {
     let pet: Pet?
@@ -13,12 +12,44 @@ struct PetDetailView: View {
     @State private var selectedDogBreed: DogBreed?
     @State private var selectedCatBreed: CatBreed?
     @State private var photoData: Data?
+    @State private var originalPhotoData: Data?
 
-    @State private var selectedPhotoItem: PhotosPickerItem?
-    @State private var isLoadingPhoto = false
+    // 定数定義
+    private enum Constants {
+        static let fullScreenTransitionDelay: TimeInterval = 0.3
+        static let originalImageMaxSize: CGFloat = 2000
+        static let originalImageCompressionQuality: CGFloat = 0.9
+    }
+
+    // フルスクリーン表示の状態管理用
+    enum FullScreenState: Identifiable {
+        case imagePicker
+        case photoCropper(UIImage)
+
+        var id: String {
+            switch self {
+            case .imagePicker: return "imagePicker"
+            case .photoCropper: return "photoCropper"
+            }
+        }
+    }
+    @State private var fullScreenState: FullScreenState?
 
     var isEditing: Bool {
         pet != nil
+    }
+
+    private var currentBreedString: String? {
+        switch selectedSpecies {
+        case .dog: return selectedDogBreed?.rawValue
+        case .cat: return selectedCatBreed?.rawValue
+        default: return nil
+        }
+    }
+
+    private func setFullScreenState(_ state: FullScreenState) {
+        guard fullScreenState == nil else { return }
+        fullScreenState = state
     }
 
     var body: some View {
@@ -38,8 +69,8 @@ struct PetDetailView: View {
                     Picker("種別", selection: $selectedSpecies) {
                         ForEach(PetType.allCases, id: \.self) { type in
                             HStack {
-                                Image(systemName: iconForSpecies(type))
-                                Text(displayNameForSpecies(type))
+                                Image(systemName: type.systemIcon)
+                                Text(type.displayName)
                             }
                             .tag(type)
                         }
@@ -99,28 +130,38 @@ struct PetDetailView: View {
 
                 Section("写真") {
                     VStack(spacing: 16) {
-                        if isLoadingPhoto {
-                            ProgressView()
-                                .frame(width: 150, height: 150)
-                        } else {
-                            PetPhotoView(
-                                photoData: photoData,
-                                size: 150,
-                                shape: .roundedRectangle(cornerRadius: 16)
-                            )
-                        }
+                        PetPhotoView(
+                            photoData: photoData,
+                            size: 150,
+                            shape: .roundedRectangle(cornerRadius: 16)
+                        )
 
-                        PhotosPicker(
-                            selection: $selectedPhotoItem,
-                            matching: .images,
-                            photoLibrary: .shared()
-                        ) {
+                        Button {
+                            setFullScreenState(.imagePicker)
+                        } label: {
                             Label("写真を選択", systemImage: "photo.on.rectangle")
                                 .frame(maxWidth: .infinity)
                                 .padding()
                                 .background(Color.blue.opacity(0.1))
                                 .foregroundColor(.blue)
                                 .cornerRadius(10)
+                        }
+                        .buttonStyle(.plain)
+
+                        // 既存の写真がある場合は再編集ボタンを表示
+                        if let originalData = originalPhotoData,
+                           let originalImage = UIImage(data: originalData) {
+                            Button {
+                                setFullScreenState(.photoCropper(originalImage))
+                            } label: {
+                                Label("写真を編集", systemImage: "crop.rotate")
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(Color.green.opacity(0.1))
+                                    .foregroundColor(.green)
+                                    .cornerRadius(10)
+                            }
+                            .buttonStyle(.plain)
                         }
                     }
                     .frame(maxWidth: .infinity)
@@ -148,9 +189,37 @@ struct PetDetailView: View {
                     .disabled(name.isEmpty)
                 }
             }
-            .onChange(of: selectedPhotoItem) { _, newItem in
-                Task {
-                    await loadPhoto(from: newItem)
+            .fullScreenCover(item: $fullScreenState) { state in
+                switch state {
+                case .imagePicker:
+                    ImagePicker { image in
+                        // 元画像を保存
+                        originalPhotoData = PhotoManager.shared.processImage(
+                            image,
+                            maxSize: Constants.originalImageMaxSize,
+                            compressionQuality: Constants.originalImageCompressionQuality
+                        )
+                        // 編集画面を表示（少し遅延させてfullScreenCoverの完全な閉じを待つ）
+                        DispatchQueue.main.asyncAfter(deadline: .now() + Constants.fullScreenTransitionDelay) {
+                            fullScreenState = .photoCropper(image)
+                        }
+                    }
+
+                case .photoCropper(let image):
+                    PhotoCropperView(
+                        image: image,
+                        onComplete: { croppedImage in
+                            // 切り抜いた画像を保存
+                            photoData = PhotoManager.shared.processImage(
+                                croppedImage,
+                                maxSize: AppConfig.maxImageSize
+                            )
+                            fullScreenState = nil
+                        },
+                        onCancel: {
+                            fullScreenState = nil
+                        }
+                    )
                 }
             }
             .onAppear {
@@ -159,6 +228,7 @@ struct PetDetailView: View {
                     birthDate = pet.birthDate
                     selectedSpecies = pet.species
                     photoData = pet.photoData
+                    originalPhotoData = pet.originalPhotoData
 
                     // 品種の読み込み
                     if let breedString = pet.breed {
@@ -181,17 +251,6 @@ struct PetDetailView: View {
     }
 
     private func savePet() {
-        // 選択された品種の取得
-        let breedString: String?
-        switch selectedSpecies {
-        case .dog:
-            breedString = selectedDogBreed?.rawValue
-        case .cat:
-            breedString = selectedCatBreed?.rawValue
-        default:
-            breedString = nil
-        }
-
         let newPet: Pet
         if let existingPet = pet {
             newPet = Pet(
@@ -200,8 +259,9 @@ struct PetDetailView: View {
                 birthDate: birthDate,
                 species: selectedSpecies,
                 photoData: photoData,
+                originalPhotoData: originalPhotoData,
                 displayOrder: existingPet.displayOrder,
-                breed: breedString
+                breed: currentBreedString
             )
         } else {
             newPet = Pet(
@@ -209,7 +269,8 @@ struct PetDetailView: View {
                 birthDate: birthDate,
                 species: selectedSpecies,
                 photoData: photoData,
-                breed: breedString
+                originalPhotoData: originalPhotoData,
+                breed: currentBreedString
             )
         }
 
@@ -217,70 +278,17 @@ struct PetDetailView: View {
         dismiss()
     }
 
-    private func loadPhoto(from item: PhotosPickerItem?) async {
-        guard let item = item else { return }
-
-        isLoadingPhoto = true
-        defer { isLoadingPhoto = false }
-
-        do {
-            if let data = try await item.loadTransferable(type: Data.self),
-               let image = UIImage(data: data) {
-                // PhotoManagerを使って画像をリサイズ
-                photoData = PhotoManager.shared.processImage(image, maxSize: AppConfig.maxImageSize)
-            }
-        } catch {
-            print("写真の読み込みに失敗: \(error)")
-        }
-    }
-
     private func createPreviewPet() -> Pet {
-        // 選択された品種の取得
-        let breedString: String?
-        switch selectedSpecies {
-        case .dog:
-            breedString = selectedDogBreed?.rawValue
-        case .cat:
-            breedString = selectedCatBreed?.rawValue
-        default:
-            breedString = nil
-        }
-
         return Pet(
             id: pet?.id ?? UUID(),
             name: name.isEmpty ? "名前未設定" : name,
             birthDate: birthDate,
             species: selectedSpecies,
             photoData: photoData,
-            breed: breedString
+            breed: currentBreedString
         )
     }
 
-    private func iconForSpecies(_ species: PetType) -> String {
-        switch species {
-        case .dog: return "pawprint.fill"
-        case .cat: return "cat.fill"
-        case .fish: return "fish.fill"
-        case .smallAnimal: return "hare.fill"
-        case .turtle: return "tortoise.fill"
-        case .bird: return "bird.fill"
-        case .insect: return "ladybug.fill"
-        case .other: return "questionmark.circle.fill"
-        }
-    }
-
-    private func displayNameForSpecies(_ species: PetType) -> String {
-        switch species {
-        case .dog: return "犬"
-        case .cat: return "猫"
-        case .fish: return "魚"
-        case .smallAnimal: return "小動物"
-        case .turtle: return "カメ"
-        case .bird: return "鳥"
-        case .insect: return "虫"
-        case .other: return "その他"
-        }
-    }
 }
 
 #Preview {

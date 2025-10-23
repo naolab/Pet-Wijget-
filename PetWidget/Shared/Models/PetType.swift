@@ -36,6 +36,19 @@ enum PetType: String, Codable, CaseIterable {
         }
     }
 
+    var systemIcon: String {
+        switch self {
+        case .dog: return "pawprint.fill"
+        case .cat: return "cat.fill"
+        case .fish: return "fish.fill"
+        case .smallAnimal: return "hare.fill"
+        case .turtle: return "tortoise.fill"
+        case .bird: return "bird.fill"
+        case .insect: return "ladybug.fill"
+        case .other: return "questionmark.circle.fill"
+        }
+    }
+
     /// 年齢換算プロファイルを取得
     var ageConversionProfile: AgeConversionProfile {
         switch self {
