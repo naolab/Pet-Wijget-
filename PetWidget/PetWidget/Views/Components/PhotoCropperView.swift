@@ -62,37 +62,6 @@ struct PhotoCropperView: View {
                             .offset(offset)
                             .frame(width: cropFrameSize, height: cropFrameSize)
                             .clipped()
-                            .gesture(
-                                MagnificationGesture()
-                                    .onChanged { value in
-                                        let delta = value / lastScale
-                                        lastScale = value
-                                        let newScale = scale * delta
-                                        scale = min(max(newScale, minScale), maxScale)
-                                    }
-                                    .onEnded { _ in
-                                        lastScale = 1.0
-                                    }
-                                    .simultaneously(with: DragGesture()
-                                        .onChanged { value in
-                                            offset = CGSize(
-                                                width: lastOffset.width + value.translation.width,
-                                                height: lastOffset.height + value.translation.height
-                                            )
-                                        }
-                                        .onEnded { _ in
-                                            lastOffset = offset
-                                        }
-                                    )
-                                    .simultaneously(with: RotationGesture()
-                                        .onChanged { value in
-                                            rotation = lastRotation + value
-                                        }
-                                        .onEnded { _ in
-                                            lastRotation = rotation
-                                        }
-                                    )
-                            )
 
                         // クロップフレーム（正方形の枠線）
                         Rectangle()
@@ -102,7 +71,39 @@ struct PhotoCropperView: View {
                         // 暗い領域（フレーム外）
                         CropOverlay(frameSize: cropFrameSize)
                     }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .frame(width: cropFrameSize, height: cropFrameSize)
+                    .contentShape(Rectangle())
+                    .gesture(
+                        MagnificationGesture()
+                            .onChanged { value in
+                                let delta = value / lastScale
+                                lastScale = value
+                                let newScale = scale * delta
+                                scale = min(max(newScale, minScale), maxScale)
+                            }
+                            .onEnded { _ in
+                                lastScale = 1.0
+                            }
+                            .simultaneously(with: DragGesture()
+                                .onChanged { value in
+                                    offset = CGSize(
+                                        width: lastOffset.width + value.translation.width,
+                                        height: lastOffset.height + value.translation.height
+                                    )
+                                }
+                                .onEnded { _ in
+                                    lastOffset = offset
+                                }
+                            )
+                            .simultaneously(with: RotationGesture()
+                                .onChanged { value in
+                                    rotation = lastRotation + value
+                                }
+                                .onEnded { _ in
+                                    lastRotation = rotation
+                                }
+                            )
+                    )
 
                     Spacer()
 
