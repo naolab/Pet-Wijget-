@@ -9,6 +9,8 @@ struct PhotoCropperView: View {
     @State private var lastScale: CGFloat = 1.0
     @State private var offset: CGSize = .zero
     @State private var lastOffset: CGSize = .zero
+    @State private var rotation: Angle = .zero
+    @State private var lastRotation: Angle = .zero
 
     private let minScale: CGFloat = 1.0
     private let maxScale: CGFloat = 5.0
@@ -56,6 +58,7 @@ struct PhotoCropperView: View {
                             .resizable()
                             .scaledToFit()
                             .scaleEffect(scale)
+                            .rotationEffect(rotation)
                             .offset(offset)
                             .frame(width: cropFrameSize, height: cropFrameSize)
                             .clipped()
@@ -81,6 +84,14 @@ struct PhotoCropperView: View {
                                             lastOffset = offset
                                         }
                                     )
+                                    .simultaneously(with: RotationGesture()
+                                        .onChanged { value in
+                                            rotation = lastRotation + value
+                                        }
+                                        .onEnded { _ in
+                                            lastRotation = rotation
+                                        }
+                                    )
                             )
 
                         // クロップフレーム（正方形の枠線）
@@ -95,13 +106,26 @@ struct PhotoCropperView: View {
 
                     Spacer()
 
-                    // ズーム表示
-                    Text("×\(String(format: "%.1f", scale))")
+                    // 90度回転ボタン
+                    Button(action: {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            rotation += .degrees(90)
+                            lastRotation = rotation
+                        }
+                    }) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "rotate.right")
+                                .font(.system(size: 20))
+                            Text("90°回転")
+                                .font(.system(size: 16, weight: .medium))
+                        }
                         .foregroundColor(.white)
-                        .padding()
-                        .background(Color.black.opacity(0.5))
-                        .cornerRadius(8)
-                        .padding(.bottom, 20)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 12)
+                        .background(Color.blue.opacity(0.8))
+                        .cornerRadius(10)
+                    }
+                    .padding(.bottom, 20)
                 }
             }
         }
@@ -112,7 +136,8 @@ struct PhotoCropperView: View {
             image,
             scale: scale,
             offset: offset,
-            frameSize: cropFrameSize
+            frameSize: cropFrameSize,
+            rotation: CGFloat(rotation.radians)
         ) else {
             return
         }

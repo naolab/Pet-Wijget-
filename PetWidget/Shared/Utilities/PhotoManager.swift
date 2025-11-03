@@ -28,9 +28,12 @@ final class PhotoManager {
     //   - scale: 拡大率（1.0 = 原寸、2.0 = 2倍拡大）
     //   - offset: オフセット（UIのドラッグ量）
     //   - frameSize: クロップフレームのサイズ
+    //   - rotation: 回転角度
     // - Returns: 切り抜かれた正方形の画像
-    func cropImage(_ image: UIImage, scale: CGFloat, offset: CGSize, frameSize: CGFloat) -> UIImage? {
-        guard let cgImage = image.cgImage else { return nil }
+    func cropImage(_ image: UIImage, scale: CGFloat, offset: CGSize, frameSize: CGFloat, rotation: CGFloat = 0) -> UIImage? {
+        // 回転を適用
+        let rotatedImage = rotation != 0 ? rotateImage(image, radians: rotation) : image
+        guard let cgImage = rotatedImage.cgImage else { return nil }
 
         let imageSize = CGSize(width: cgImage.width, height: cgImage.height)
 
@@ -95,6 +98,32 @@ final class PhotoManager {
         let renderer = UIGraphicsImageRenderer(size: newSize)
         return renderer.image { _ in
             image.draw(in: CGRect(origin: .zero, size: newSize))
+        }
+    }
+
+    // 画像を回転
+    private func rotateImage(_ image: UIImage, radians: CGFloat) -> UIImage {
+        // 回転後のサイズを計算
+        let rotatedSize = CGRect(origin: .zero, size: image.size)
+            .applying(CGAffineTransform(rotationAngle: radians))
+            .integral.size
+
+        // 新しい画像を描画
+        let renderer = UIGraphicsImageRenderer(size: rotatedSize)
+        return renderer.image { context in
+            let cgContext = context.cgContext
+
+            // 原点を画像の中心に移動
+            cgContext.translateBy(x: rotatedSize.width / 2, y: rotatedSize.height / 2)
+            // 回転
+            cgContext.rotate(by: radians)
+            // 画像を描画（中心を原点に）
+            image.draw(in: CGRect(
+                x: -image.size.width / 2,
+                y: -image.size.height / 2,
+                width: image.size.width,
+                height: image.size.height
+            ))
         }
     }
 }
