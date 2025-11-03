@@ -89,21 +89,17 @@ struct PhotoCropperView: View {
                                 let delta = value / lastScale
                                 lastScale = value
                                 let newScale = scale * delta
-                                let minScale = minimumScale(for: rotation)
                                 scale = min(max(newScale, minScale), maxScale)
-                                offset = clampedOffset(for: offset, scale: scale, rotation: rotation)
                             }
                             .onEnded { _ in
                                 lastScale = 1.0
-                                lastOffset = offset
                             }
                             .simultaneously(with: DragGesture()
                                 .onChanged { value in
-                                    let proposedOffset = CGSize(
+                                    offset = CGSize(
                                         width: lastOffset.width + value.translation.width,
                                         height: lastOffset.height + value.translation.height
                                     )
-                                    offset = clampedOffset(for: proposedOffset, scale: scale, rotation: rotation)
                                 }
                                 .onEnded { _ in
                                     lastOffset = offset
@@ -112,15 +108,9 @@ struct PhotoCropperView: View {
                             .simultaneously(with: RotationGesture()
                                 .onChanged { value in
                                     rotation = lastRotation + value
-                                    let minScale = minimumScale(for: rotation)
-                                    if scale < minScale {
-                                        scale = minScale
-                                    }
-                                    offset = clampedOffset(for: offset, scale: scale, rotation: rotation)
                                 }
                                 .onEnded { _ in
                                     lastRotation = rotation
-                                    lastOffset = offset
                                 }
                             )
                     )
@@ -132,12 +122,6 @@ struct PhotoCropperView: View {
                         withAnimation(.easeInOut(duration: 0.3)) {
                             rotation += .degrees(90)
                             lastRotation = rotation
-                            let minScale = minimumScale(for: rotation)
-                            if scale < minScale {
-                                scale = minScale
-                            }
-                            offset = clampedOffset(for: offset, scale: scale, rotation: rotation)
-                            lastOffset = offset
                         }
                     }) {
                         Image(systemName: "rotate.right")
@@ -162,49 +146,6 @@ struct PhotoCropperView: View {
         }
 
         onComplete(croppedImage)
-    }
-
-    private func minimumScale(for rotation: Angle) -> CGFloat {
-        let displaySize = displaySize(for: rotation)
-        let widthScale = cropFrameSize / displaySize.width
-        let heightScale = cropFrameSize / displaySize.height
-        return max(widthScale, heightScale, minScale)
-    }
-
-    private func displaySize(for rotation: Angle) -> CGSize {
-        let rotatedSize = rotatedImageSize(for: image.size, angle: CGFloat(rotation.radians))
-        let aspectRatio = rotatedSize.width / rotatedSize.height
-
-        if aspectRatio > 1 {
-            return CGSize(width: cropFrameSize * aspectRatio, height: cropFrameSize)
-        } else {
-            return CGSize(width: cropFrameSize, height: cropFrameSize / aspectRatio)
-        }
-    }
-
-    private func rotatedImageSize(for size: CGSize, angle: CGFloat) -> CGSize {
-        let normalizedAngle = abs(angle.truncatingRemainder(dividingBy: .pi))
-        let cosValue = abs(cos(normalizedAngle))
-        let sinValue = abs(sin(normalizedAngle))
-
-        let width = size.width * cosValue + size.height * sinValue
-        let height = size.width * sinValue + size.height * cosValue
-
-        return CGSize(width: width, height: height)
-    }
-
-    private func clampedOffset(for proposedOffset: CGSize, scale: CGFloat, rotation: Angle) -> CGSize {
-        let displaySize = displaySize(for: rotation)
-        let scaledWidth = displaySize.width * scale
-        let scaledHeight = displaySize.height * scale
-
-        let horizontalLimit = max(0, (scaledWidth - cropFrameSize) / 2)
-        let verticalLimit = max(0, (scaledHeight - cropFrameSize) / 2)
-
-        let clampedX = min(max(proposedOffset.width, -horizontalLimit), horizontalLimit)
-        let clampedY = min(max(proposedOffset.height, -verticalLimit), verticalLimit)
-
-        return CGSize(width: clampedX, height: clampedY)
     }
 }
 
