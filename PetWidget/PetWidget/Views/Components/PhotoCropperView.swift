@@ -19,8 +19,19 @@ struct PhotoCropperView: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                // 背景（暗い）
-                Color.black
+                // 背景（元画像のぼかし）
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: geometry.size.width, height: geometry.size.height)
+                    .clipped()
+                    .blur(radius: 20)
+                    .opacity(0.5)
+                    .allowsHitTesting(false)
+                    .ignoresSafeArea()
+
+                Color.black.opacity(0.6)
+                    .allowsHitTesting(false)
                     .ignoresSafeArea()
 
                 VStack(spacing: 0) {
