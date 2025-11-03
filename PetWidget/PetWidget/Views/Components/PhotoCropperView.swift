@@ -114,17 +114,9 @@ struct PhotoCropperView: View {
                             lastRotation = rotation
                         }
                     }) {
-                        HStack(spacing: 8) {
-                            Image(systemName: "rotate.right")
-                                .font(.system(size: 20))
-                            Text("90°回転")
-                                .font(.system(size: 16, weight: .medium))
-                        }
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 12)
-                        .background(Color.blue.opacity(0.8))
-                        .cornerRadius(10)
+                        Image(systemName: "rotate.right")
+                            .font(.system(size: 24, weight: .medium))
+                            .foregroundColor(.white)
                     }
                     .padding(.bottom, 20)
                 }
