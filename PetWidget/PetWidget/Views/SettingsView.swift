@@ -18,6 +18,9 @@ struct SettingsView: View {
             // レイアウトセクション
             layoutSection
 
+            // フォントデザインセクション
+            fontDesignSection
+
             // フォントサイズセクション
             fontSizeSection
 
@@ -113,6 +116,24 @@ struct SettingsView: View {
                     viewModel.saveSettings()
                 }
 
+            if viewModel.widgetSettings.displaySettings.showAge {
+                Picker("年齢表示形式", selection: $viewModel.widgetSettings.displaySettings.ageDisplayDetail) {
+                    ForEach(AgeDisplayDetailLevel.allCases, id: \.self) { level in
+                        HStack {
+                            Text(level.displayName)
+                            Spacer()
+                            Text(level.example)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        .tag(level)
+                    }
+                }
+                .onChange(of: viewModel.widgetSettings.displaySettings.ageDisplayDetail) { _, _ in
+                    viewModel.saveSettings()
+                }
+            }
+
             Toggle("人間換算年齢を表示", isOn: $viewModel.widgetSettings.displaySettings.showHumanAge)
                 .onChange(of: viewModel.widgetSettings.displaySettings.showHumanAge) { _, _ in
                     viewModel.saveSettings()
@@ -155,6 +176,33 @@ struct SettingsView: View {
             Text("レイアウト")
         } footer: {
             Text("ウィジェット内のテキストの配置を変更します")
+        }
+    }
+
+    // MARK: - Font Design Section
+    private var fontDesignSection: some View {
+        Section {
+            Picker("テキスト用フォント", selection: $viewModel.widgetSettings.displaySettings.textFontDesign) {
+                ForEach(FontDesignType.allCases, id: \.self) { design in
+                    Text(design.displayName).tag(design)
+                }
+            }
+            .onChange(of: viewModel.widgetSettings.displaySettings.textFontDesign) { _, _ in
+                viewModel.saveSettings()
+            }
+
+            Picker("時刻・日付用フォント", selection: $viewModel.widgetSettings.displaySettings.timeDateFontDesign) {
+                ForEach(FontDesignType.allCases, id: \.self) { design in
+                    Text(design.displayName).tag(design)
+                }
+            }
+            .onChange(of: viewModel.widgetSettings.displaySettings.timeDateFontDesign) { _, _ in
+                viewModel.saveSettings()
+            }
+        } header: {
+            Text("フォントデザイン")
+        } footer: {
+            Text("テキスト用はペット名・年齢、時刻・日付用は時計部分に適用されます")
         }
     }
 

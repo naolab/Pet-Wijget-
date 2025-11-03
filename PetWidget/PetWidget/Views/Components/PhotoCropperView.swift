@@ -9,15 +9,17 @@ struct PhotoCropperView: View {
     @State private var lastScale: CGFloat = 1.0
     @State private var offset: CGSize = .zero
     @State private var lastOffset: CGSize = .zero
+    @State private var rotation: Angle = .zero
+    @State private var lastRotation: Angle = .zero
 
-    private let minScale: CGFloat = 1.0
+    private let minScale: CGFloat = 0.5
     private let maxScale: CGFloat = 5.0
     private let cropFrameSize: CGFloat = 300
 
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                // 背景（暗い）
+                // 背景は黒で統一
                 Color.black
                     .ignoresSafeArea()
 
@@ -51,37 +53,25 @@ struct PhotoCropperView: View {
 
                     // 画像表示エリア
                     ZStack {
+                        // 暗く表示する背景用（フレーム外の見え方用）
+                        Image(uiImage: image)
+                            .resizable()
+                            .scaledToFit()
+                            .scaleEffect(scale)
+                            .rotationEffect(rotation)
+                            .offset(offset)
+                            .opacity(0.35)
+                            .allowsHitTesting(false)
+
                         // 画像
                         Image(uiImage: image)
                             .resizable()
                             .scaledToFit()
                             .scaleEffect(scale)
+                            .rotationEffect(rotation)
                             .offset(offset)
                             .frame(width: cropFrameSize, height: cropFrameSize)
                             .clipped()
-                            .gesture(
-                                MagnificationGesture()
-                                    .onChanged { value in
-                                        let delta = value / lastScale
-                                        lastScale = value
-                                        let newScale = scale * delta
-                                        scale = min(max(newScale, minScale), maxScale)
-                                    }
-                                    .onEnded { _ in
-                                        lastScale = 1.0
-                                    }
-                                    .simultaneously(with: DragGesture()
-                                        .onChanged { value in
-                                            offset = CGSize(
-                                                width: lastOffset.width + value.translation.width,
-                                                height: lastOffset.height + value.translation.height
-                                            )
-                                        }
-                                        .onEnded { _ in
-                                            lastOffset = offset
-                                        }
-                                    )
-                            )
 
                         // クロップフレーム（正方形の枠線）
                         Rectangle()
@@ -91,17 +81,54 @@ struct PhotoCropperView: View {
                         // 暗い領域（フレーム外）
                         CropOverlay(frameSize: cropFrameSize)
                     }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .frame(width: cropFrameSize, height: cropFrameSize)
+                    .contentShape(Rectangle())
+                    .gesture(
+                        MagnificationGesture()
+                            .onChanged { value in
+                                let delta = value / lastScale
+                                lastScale = value
+                                let newScale = scale * delta
+                                scale = min(max(newScale, minScale), maxScale)
+                            }
+                            .onEnded { _ in
+                                lastScale = 1.0
+                            }
+                            .simultaneously(with: DragGesture()
+                                .onChanged { value in
+                                    offset = CGSize(
+                                        width: lastOffset.width + value.translation.width,
+                                        height: lastOffset.height + value.translation.height
+                                    )
+                                }
+                                .onEnded { _ in
+                                    lastOffset = offset
+                                }
+                            )
+                            .simultaneously(with: RotationGesture()
+                                .onChanged { value in
+                                    rotation = lastRotation + value
+                                }
+                                .onEnded { _ in
+                                    lastRotation = rotation
+                                }
+                            )
+                    )
 
                     Spacer()
 
-                    // ズーム表示
-                    Text("×\(String(format: "%.1f", scale))")
-                        .foregroundColor(.white)
-                        .padding()
-                        .background(Color.black.opacity(0.5))
-                        .cornerRadius(8)
-                        .padding(.bottom, 20)
+                    // 90度回転ボタン
+                    Button(action: {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            rotation += .degrees(90)
+                            lastRotation = rotation
+                        }
+                    }) {
+                        Image(systemName: "rotate.right")
+                            .font(.system(size: 24, weight: .medium))
+                            .foregroundColor(.white)
+                    }
+                    .padding(.bottom, 20)
                 }
             }
         }
@@ -112,7 +139,8 @@ struct PhotoCropperView: View {
             image,
             scale: scale,
             offset: offset,
-            frameSize: cropFrameSize
+            frameSize: cropFrameSize,
+            rotation: CGFloat(rotation.radians)
         ) else {
             return
         }

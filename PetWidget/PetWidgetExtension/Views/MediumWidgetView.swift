@@ -35,14 +35,14 @@ struct MediumWidgetView: View {
                 // 現在時刻
                 if displaySettings.showTime {
                     Text(entry.date, style: .time)
-                        .font(.system(size: CGFloat(displaySettings.timeFontSize), weight: .bold))
+                        .font(.system(size: CGFloat(displaySettings.timeFontSize), weight: .bold, design: displaySettings.timeDateFontDesign.design))
                         .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor))
                 }
 
                 // 日付
                 if displaySettings.showDate {
                     Text(formattedDate(entry.date, format: displaySettings.dateFormat))
-                        .font(.system(size: CGFloat(displaySettings.dateFontSize)))
+                        .font(.system(size: CGFloat(displaySettings.dateFontSize), design: displaySettings.timeDateFontDesign.design))
                         .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.7))
                 }
 
@@ -58,7 +58,7 @@ struct MediumWidgetView: View {
                         Image(systemName: speciesIcon(pet.species))
                             .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.7))
                         Text(pet.name)
-                            .font(.system(size: CGFloat(displaySettings.nameFontSize), weight: .semibold))
+                            .font(.system(size: CGFloat(displaySettings.nameFontSize), weight: .semibold, design: displaySettings.textFontDesign.design))
                             .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor))
                     }
                 }
@@ -67,13 +67,13 @@ struct MediumWidgetView: View {
                 VStack(alignment: displaySettings.textAlignment.horizontalAlignment, spacing: 2) {
                     if displaySettings.showAge {
                         Text(ageText(pet))
-                            .font(.system(size: CGFloat(displaySettings.ageFontSize)))
+                            .font(.system(size: CGFloat(displaySettings.ageFontSize), design: displaySettings.textFontDesign.design))
                             .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.7))
                     }
 
                     if displaySettings.showHumanAge {
                         Text("人間だと \(pet.humanAge)歳")
-                            .font(.system(size: CGFloat(displaySettings.ageFontSize * 0.9)))
+                            .font(.system(size: CGFloat(displaySettings.ageFontSize * 0.9), design: displaySettings.textFontDesign.design))
                             .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.7))
                     }
                 }
@@ -174,17 +174,7 @@ struct MediumWidgetView: View {
     }
 
     private func ageText(_ pet: Pet) -> String {
-        let components = pet.ageComponents
-        let years = components.year ?? 0
-        let months = components.month ?? 0
-
-        if years == 0 {
-            return "\(months)ヶ月"
-        } else if months == 0 {
-            return "\(years)歳"
-        } else {
-            return "\(years)歳\(months)ヶ月"
-        }
+        return AgeCalculator.ageString(from: pet.birthDate, detailLevel: entry.settings.displaySettings.ageDisplayDetail)
     }
 
     private func speciesIcon(_ species: PetType) -> String {

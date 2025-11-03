@@ -3,10 +3,12 @@ import SwiftUI
 struct AgeDisplayView: View {
     let pet: Pet
     let showHumanAge: Bool
+    let detailLevel: AgeDisplayDetailLevel?
 
-    init(pet: Pet, showHumanAge: Bool = true) {
+    init(pet: Pet, showHumanAge: Bool = true, detailLevel: AgeDisplayDetailLevel? = nil) {
         self.pet = pet
         self.showHumanAge = showHumanAge
+        self.detailLevel = detailLevel
     }
 
     var body: some View {
@@ -31,6 +33,12 @@ struct AgeDisplayView: View {
     }
 
     private var ageText: String {
+        // detailLevelが指定されている場合はそれを使用
+        if let detailLevel = detailLevel {
+            return AgeCalculator.ageString(from: pet.birthDate, detailLevel: detailLevel)
+        }
+
+        // 指定がない場合は従来の表示（年月）
         let components = pet.ageComponents
         let years = components.year ?? 0
         let months = components.month ?? 0

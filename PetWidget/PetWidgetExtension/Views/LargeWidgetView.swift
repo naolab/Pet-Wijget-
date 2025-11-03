@@ -70,19 +70,19 @@ struct LargeWidgetView: View {
             // 現在時刻
             if displaySettings.showTime {
                 Text(entry.date, style: .time)
-                    .font(.system(size: CGFloat(displaySettings.timeFontSize * 1.5), weight: .bold, design: .rounded))
+                    .font(.system(size: CGFloat(displaySettings.timeFontSize * 1.5), weight: .bold, design: displaySettings.timeDateFontDesign.design))
                     .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor))
             }
 
             // 日付
             if displaySettings.showDate {
                 Text(formattedDate(entry.date, format: displaySettings.dateFormat))
-                    .font(.system(size: CGFloat(displaySettings.dateFontSize + 4)))
+                    .font(.system(size: CGFloat(displaySettings.dateFontSize + 4), design: displaySettings.timeDateFontDesign.design))
                     .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.7))
 
                 // 曜日
                 Text(formattedWeekday(entry.date))
-                    .font(.system(size: CGFloat(displaySettings.dateFontSize + 2)))
+                    .font(.system(size: CGFloat(displaySettings.dateFontSize + 2), design: displaySettings.timeDateFontDesign.design))
                     .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.7))
             }
         }
@@ -104,7 +104,7 @@ struct LargeWidgetView: View {
                             .font(.system(size: 18))
                             .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.8))
                         Text(pet.name)
-                            .font(.system(size: CGFloat(displaySettings.nameFontSize * 1.5), weight: .bold))
+                            .font(.system(size: CGFloat(displaySettings.nameFontSize * 1.5), weight: .bold, design: displaySettings.textFontDesign.design))
                             .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor))
                     }
                 }
@@ -115,7 +115,7 @@ struct LargeWidgetView: View {
                         .font(.system(size: 12))
                         .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.6))
                     Text("誕生日: \(formattedBirthDate(pet.birthDate))")
-                        .font(.system(size: CGFloat(displaySettings.ageFontSize)))
+                        .font(.system(size: CGFloat(displaySettings.ageFontSize), design: displaySettings.textFontDesign.design))
                         .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.7))
                 }
 
@@ -127,7 +127,7 @@ struct LargeWidgetView: View {
                                 .font(.system(size: 12))
                                 .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.6))
                             Text(ageText(pet))
-                                .font(.system(size: CGFloat(displaySettings.ageFontSize + 2), weight: .semibold))
+                                .font(.system(size: CGFloat(displaySettings.ageFontSize + 2), weight: .semibold, design: displaySettings.textFontDesign.design))
                                 .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor))
                         }
                     }
@@ -138,7 +138,7 @@ struct LargeWidgetView: View {
                                 .font(.system(size: 12))
                                 .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.6))
                             Text("人間だと \(pet.humanAge)歳")
-                                .font(.system(size: CGFloat(displaySettings.ageFontSize)))
+                                .font(.system(size: CGFloat(displaySettings.ageFontSize), design: displaySettings.textFontDesign.design))
                                 .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.7))
                         }
                     }
@@ -257,17 +257,7 @@ struct LargeWidgetView: View {
     }
 
     private func ageText(_ pet: Pet) -> String {
-        let components = pet.ageComponents
-        let years = components.year ?? 0
-        let months = components.month ?? 0
-
-        if years == 0 {
-            return "\(months)ヶ月"
-        } else if months == 0 {
-            return "\(years)歳"
-        } else {
-            return "\(years)歳\(months)ヶ月"
-        }
+        return AgeCalculator.ageString(from: pet.birthDate, detailLevel: entry.settings.displaySettings.ageDisplayDetail)
     }
 
     private func speciesIcon(_ species: PetType) -> String {

@@ -17,7 +17,14 @@ struct DisplaySettings: Codable {
     // レイアウト設定
     var textAlignment: TextAlignmentType
 
-    // フォント設定
+    // 年齢表示詳細度
+    var ageDisplayDetail: AgeDisplayDetailLevel
+
+    // フォントデザイン
+    var textFontDesign: FontDesignType      // テキスト（名前・年齢）用
+    var timeDateFontDesign: FontDesignType  // 時刻・日付用
+
+    // フォントサイズ
     var nameFontSize: CGFloat
     var ageFontSize: CGFloat
     var timeFontSize: CGFloat
@@ -34,6 +41,9 @@ struct DisplaySettings: Codable {
             use24HourFormat: true,
             dateFormat: .yearMonthDay,
             textAlignment: .leading,
+            ageDisplayDetail: .yearsAndMonths,
+            textFontDesign: .default,
+            timeDateFontDesign: .rounded,
             nameFontSize: 16,
             ageFontSize: 14,
             timeFontSize: 24,
@@ -84,6 +94,53 @@ enum TextAlignmentType: String, Codable, CaseIterable {
         case .leading: return .leading
         case .center: return .center
         case .trailing: return .trailing
+        }
+    }
+}
+
+enum AgeDisplayDetailLevel: String, Codable, CaseIterable {
+    case yearsOnly = "years"
+    case yearsAndMonths = "yearsMonths"
+    case full = "full"
+
+    var displayName: String {
+        switch self {
+        case .yearsOnly: return "年のみ"
+        case .yearsAndMonths: return "年月"
+        case .full: return "年月日"
+        }
+    }
+
+    var example: String {
+        switch self {
+        case .yearsOnly: return "3歳"
+        case .yearsAndMonths: return "3歳2ヶ月"
+        case .full: return "3歳2ヶ月15日"
+        }
+    }
+}
+
+enum FontDesignType: String, Codable, CaseIterable {
+    case `default` = "default"
+    case rounded = "rounded"
+    case serif = "serif"
+    case monospaced = "monospaced"
+
+    var displayName: String {
+        switch self {
+        case .default: return "標準"
+        case .rounded: return "丸ゴシック"
+        case .serif: return "セリフ"
+        case .monospaced: return "等幅"
+        }
+    }
+
+    var design: Font.Design {
+        switch self {
+        case .default: return .default
+        case .rounded: return .rounded
+        case .serif: return .serif
+        case .monospaced: return .monospaced
         }
     }
 }
