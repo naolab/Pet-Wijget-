@@ -19,19 +19,8 @@ struct PhotoCropperView: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                // 背景（元画像のぼかし）
-                Image(uiImage: image)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: geometry.size.width, height: geometry.size.height)
-                    .clipped()
-                    .blur(radius: 20)
-                    .opacity(0.5)
-                    .allowsHitTesting(false)
-                    .ignoresSafeArea()
-
-                Color.black.opacity(0.6)
-                    .allowsHitTesting(false)
+                // 背景は黒で統一
+                Color.black
                     .ignoresSafeArea()
 
                 VStack(spacing: 0) {
@@ -64,6 +53,16 @@ struct PhotoCropperView: View {
 
                     // 画像表示エリア
                     ZStack {
+                        // 暗く表示する背景用（フレーム外の見え方用）
+                        Image(uiImage: image)
+                            .resizable()
+                            .scaledToFit()
+                            .scaleEffect(scale)
+                            .rotationEffect(rotation)
+                            .offset(offset)
+                            .opacity(0.35)
+                            .allowsHitTesting(false)
+
                         // 画像
                         Image(uiImage: image)
                             .resizable()
