@@ -17,6 +17,9 @@ struct DisplaySettings: Codable {
     // レイアウト設定
     var textAlignment: TextAlignmentType
 
+    // 年齢表示詳細度
+    var ageDisplayDetail: AgeDisplayDetailLevel
+
     // フォント設定
     var nameFontSize: CGFloat
     var ageFontSize: CGFloat
@@ -34,6 +37,7 @@ struct DisplaySettings: Codable {
             use24HourFormat: true,
             dateFormat: .yearMonthDay,
             textAlignment: .leading,
+            ageDisplayDetail: .yearsAndMonths,
             nameFontSize: 16,
             ageFontSize: 14,
             timeFontSize: 24,
@@ -84,6 +88,28 @@ enum TextAlignmentType: String, Codable, CaseIterable {
         case .leading: return .leading
         case .center: return .center
         case .trailing: return .trailing
+        }
+    }
+}
+
+enum AgeDisplayDetailLevel: String, Codable, CaseIterable {
+    case yearsOnly = "years"
+    case yearsAndMonths = "yearsMonths"
+    case full = "full"
+
+    var displayName: String {
+        switch self {
+        case .yearsOnly: return "年のみ"
+        case .yearsAndMonths: return "年月"
+        case .full: return "年月日"
+        }
+    }
+
+    var example: String {
+        switch self {
+        case .yearsOnly: return "3歳"
+        case .yearsAndMonths: return "3歳2ヶ月"
+        case .full: return "3歳2ヶ月15日"
         }
     }
 }

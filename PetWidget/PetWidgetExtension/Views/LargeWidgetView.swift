@@ -257,17 +257,7 @@ struct LargeWidgetView: View {
     }
 
     private func ageText(_ pet: Pet) -> String {
-        let components = pet.ageComponents
-        let years = components.year ?? 0
-        let months = components.month ?? 0
-
-        if years == 0 {
-            return "\(months)ヶ月"
-        } else if months == 0 {
-            return "\(years)歳"
-        } else {
-            return "\(years)歳\(months)ヶ月"
-        }
+        return AgeCalculator.ageString(from: pet.birthDate, detailLevel: entry.settings.displaySettings.ageDisplayDetail)
     }
 
     private func speciesIcon(_ species: PetType) -> String {

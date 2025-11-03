@@ -113,6 +113,24 @@ struct SettingsView: View {
                     viewModel.saveSettings()
                 }
 
+            if viewModel.widgetSettings.displaySettings.showAge {
+                Picker("年齢表示形式", selection: $viewModel.widgetSettings.displaySettings.ageDisplayDetail) {
+                    ForEach(AgeDisplayDetailLevel.allCases, id: \.self) { level in
+                        HStack {
+                            Text(level.displayName)
+                            Spacer()
+                            Text(level.example)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        .tag(level)
+                    }
+                }
+                .onChange(of: viewModel.widgetSettings.displaySettings.ageDisplayDetail) { _, _ in
+                    viewModel.saveSettings()
+                }
+            }
+
             Toggle("人間換算年齢を表示", isOn: $viewModel.widgetSettings.displaySettings.showHumanAge)
                 .onChange(of: viewModel.widgetSettings.displaySettings.showHumanAge) { _, _ in
                     viewModel.saveSettings()

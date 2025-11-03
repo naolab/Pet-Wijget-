@@ -50,6 +50,11 @@ struct Pet: Identifiable, Codable, Equatable {
         Calendar.current.dateComponents([.year, .month], from: birthDate, to: Date())
     }
 
+    // 年齢計算(日単位まで)
+    var ageComponentsWithDays: DateComponents {
+        Calendar.current.dateComponents([.year, .month, .day], from: birthDate, to: Date())
+    }
+
     // カスタム平均寿命（犬種または猫種が設定されている場合）
     var customLifespan: Double? {
         guard let breedString = breed else {
