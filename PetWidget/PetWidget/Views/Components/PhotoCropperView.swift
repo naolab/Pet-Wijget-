@@ -12,7 +12,7 @@ struct PhotoCropperView: View {
     @State private var rotation: Angle = .zero
     @State private var lastRotation: Angle = .zero
 
-    private let minScale: CGFloat = 1.0
+    private let minScale: CGFloat = 0.5
     private let maxScale: CGFloat = 5.0
     private let cropFrameSize: CGFloat = 300
 
