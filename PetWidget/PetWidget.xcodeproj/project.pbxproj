@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -112,14 +112,21 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		359FEA652E99634E002E7549 /* Exceptions for "PetWidget" folder in "PetWidget" target */ = {
+		359CCB392ECB3D6F001C27D5 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Intents/SelectPetIntent.swift,
+			);
+			target = 359FEA3E2E99634C002E7549 /* PetWidget */;
+		};
+		359FEA652E99634E002E7549 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
 			target = 359FEA3E2E99634C002E7549 /* PetWidget */;
 		};
-		359FEA8D2E9963B1002E7549 /* Exceptions for "PetWidgetExtension" folder in "PetWidgetExtensionExtension" target */ = {
+		359FEA8D2E9963B1002E7549 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -129,32 +136,10 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		359FEA412E99634C002E7549 /* PetWidget */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				359FEA652E99634E002E7549 /* Exceptions for "PetWidget" folder in "PetWidget" target */,
-			);
-			path = PetWidget;
-			sourceTree = "<group>";
-		};
-		359FEA562E99634E002E7549 /* PetWidgetTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = PetWidgetTests;
-			sourceTree = "<group>";
-		};
-		359FEA602E99634E002E7549 /* PetWidgetUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = PetWidgetUITests;
-			sourceTree = "<group>";
-		};
-		359FEA7B2E9963AC002E7549 /* PetWidgetExtension */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				359FEA8D2E9963B1002E7549 /* Exceptions for "PetWidgetExtension" folder in "PetWidgetExtensionExtension" target */,
-			);
-			path = PetWidgetExtension;
-			sourceTree = "<group>";
-		};
+		359FEA412E99634C002E7549 /* PetWidget */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (359FEA652E99634E002E7549 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = PetWidget; sourceTree = "<group>"; };
+		359FEA562E99634E002E7549 /* PetWidgetTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = PetWidgetTests; sourceTree = "<group>"; };
+		359FEA602E99634E002E7549 /* PetWidgetUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = PetWidgetUITests; sourceTree = "<group>"; };
+		359FEA7B2E9963AC002E7549 /* PetWidgetExtension */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (359CCB392ECB3D6F001C27D5 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 359FEA8D2E9963B1002E7549 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = PetWidgetExtension; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -403,6 +388,7 @@
 				};
 			};
 			buildConfigurationList = 359FEA3A2E99634C002E7549 /* Build configuration list for PBXProject "PetWidget" */;
+			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -411,7 +397,6 @@
 			);
 			mainGroup = 359FEA362E99634C002E7549;
 			minimizedProjectReferenceProxies = 1;
-			preferredProjectObjectVersion = 56;
 			productRefGroup = 359FEA402E99634C002E7549 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";

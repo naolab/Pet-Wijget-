@@ -86,6 +86,7 @@ final class CoreDataStack {
         #endif
 
         let storeDescription = NSPersistentStoreDescription(url: storeURL)
+        storeDescription.setOption(true as NSNumber, forKey: NSPersistentHistoryTrackingKey)
         container.persistentStoreDescriptions = [storeDescription]
 
         var loadError: Error?

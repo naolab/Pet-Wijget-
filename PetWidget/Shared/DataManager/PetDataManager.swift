@@ -21,12 +21,37 @@ final class PetDataManager: PetDataManagerProtocol {
     static let shared = PetDataManager()
 
     private let coreDataStack: CoreDataStack
+    private let userDefaults: UserDefaults
+
+    // 履歴追跡用のプロパティ
+    private let historyTokenKey = "PetDataManager.historyToken"
+    private var lastHistoryToken: NSPersistentHistoryToken? {
+        get {
+            guard let data = userDefaults.data(forKey: historyTokenKey) else { return nil }
+            return try? NSKeyedUnarchiver.unarchivedObject(ofClass: NSPersistentHistoryToken.self, from: data)
+        }
+        set {
+            guard let token = newValue,
+                  let data = try? NSKeyedArchiver.archivedData(withRootObject: token, requiringSecureCoding: true) else {
+                userDefaults.removeObject(forKey: historyTokenKey)
+                return
+            }
+            userDefaults.set(data, forKey: historyTokenKey)
+        }
+    }
 
     private init() {
         self.coreDataStack = CoreDataStack.shared
+        // App Group用のUserDefaultsを取得
+        guard let userDefaults = UserDefaults(suiteName: AppConfig.appGroupID) else {
+            fatalError("Failed to initialize UserDefaults with App Group ID: \(AppConfig.appGroupID)")
+        }
+        self.userDefaults = userDefaults
     }
 
     func fetchAll(sortBy: PetSortOption = .displayOrder) throws -> [Pet] {
+        try mergeChanges() // 変更をマージ
+
         let context = try coreDataStack.viewContext
         let request = NSFetchRequest<NSManagedObject>(entityName: "PetEntity")
 
@@ -50,6 +75,8 @@ final class PetDataManager: PetDataManagerProtocol {
     }
 
     func fetch(by id: UUID) throws -> Pet? {
+        try mergeChanges() // 変更をマージ
+
         let context = try coreDataStack.viewContext
         let request = NSFetchRequest<NSManagedObject>(entityName: "PetEntity")
         request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
@@ -109,6 +136,39 @@ final class PetDataManager: PetDataManagerProtocol {
         }
 
         try coreDataStack.saveContext()
+    }
+
+    // MARK: - Persistent History Tracking
+
+    private func mergeChanges() throws {
+        let context = try coreDataStack.viewContext
+        
+        try context.performAndWait {
+            let historyRequest = NSPersistentHistoryChangeRequest.fetchHistory(after: lastHistoryToken)
+            
+            guard let historyResult = try? context.execute(historyRequest) as? NSPersistentHistoryResult,
+                  let history = historyResult.history,
+                  !history.isEmpty else {
+                return
+            }
+
+            #if DEBUG
+            print("🔄 PetDataManager: Found \(history.count) new transaction(s) to merge.")
+            #endif
+
+            for transaction in history {
+                context.mergeChanges(fromContextDidSave: transaction.objectIDNotification())
+            }
+
+            if let lastToken = history.last?.token {
+                 if self.lastHistoryToken != lastToken {
+                     #if DEBUG
+                     print("✅ PetDataManager: Merged changes. New token saved.")
+                     #endif
+                     self.lastHistoryToken = lastToken
+                 }
+            }
+        }
     }
 
     // MARK: - Private Helpers
