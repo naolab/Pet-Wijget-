@@ -12,6 +12,26 @@ import SwiftUI
 struct PetWidgetExtension: Widget {
     let kind: String = "PetWidgetExtension"
 
+    init() {
+        // CoreDataStackの初期化
+        do {
+            try CoreDataStack.shared.setup()
+            print("✅ WidgetExtension: CoreDataStack setup initiated.")
+        } catch {
+            print("❌ WidgetExtension: Failed to setup CoreDataStack: \(error)")
+        }
+        
+        // App Group接続確認
+        if let userDefaults = UserDefaults(suiteName: AppConfig.appGroupID) {
+            print("✅ WidgetExtension: Successfully accessed shared UserDefaults.")
+            if let message = userDefaults.string(forKey: "group.test.message") {
+                print("✅ WidgetExtension: Read test message from App: \(message)")
+            }
+        } else {
+            print("❌ WidgetExtension: Failed to access shared UserDefaults. App Group configuration might be wrong.")
+        }
+    }
+
     var body: some WidgetConfiguration {
         if #available(iOS 16.0, *) {
             return IntentBasedWidget(kind: kind)
