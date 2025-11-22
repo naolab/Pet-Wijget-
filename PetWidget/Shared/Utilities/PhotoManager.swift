@@ -37,15 +37,15 @@ final class PhotoManager {
 
         let imageSize = CGSize(width: cgImage.width, height: cgImage.height)
 
-        // UI上の表示サイズを計算
+        // UI上の表示サイズを計算（scaledToFitの挙動に合わせる）
         let aspectRatio = imageSize.width / imageSize.height
         var displaySize: CGSize
         if aspectRatio > 1 {
-            // 横長画像
-            displaySize = CGSize(width: frameSize * aspectRatio, height: frameSize)
-        } else {
-            // 縦長画像
+            // 横長画像：幅を基準に高さを調整
             displaySize = CGSize(width: frameSize, height: frameSize / aspectRatio)
+        } else {
+            // 縦長画像：高さを基準に幅を調整
+            displaySize = CGSize(width: frameSize * aspectRatio, height: frameSize)
         }
 
         // スケール適用後の表示サイズ

@@ -204,6 +204,16 @@ struct PetWidgetIntentTimelineProvider: AppIntentTimelineProvider {
     }
 
     private func createEntry(for date: Date, with configuration: SelectPetIntent) async -> PetWidgetEntry {
+        #if DEBUG
+        print("═══════════════════════════════════════════════════")
+        print("🎯 [Timeline] createEntry called at \(date)")
+        print("   Configuration.selectedPet: \(configuration.selectedPet?.name ?? "nil")")
+        if let selectedPet = configuration.selectedPet {
+            print("   Configuration.selectedPet.id: \(selectedPet.id)")
+        }
+        print("═══════════════════════════════════════════════════")
+        #endif
+
         // 設定を読み込み
         let settings: WidgetSettings
         do {
@@ -222,24 +232,55 @@ struct PetWidgetIntentTimelineProvider: AppIntentTimelineProvider {
             let pets = try dataManager.fetchAll()
             #if DEBUG
             print("✅ Widget: Fetched \(pets.count) pets")
+            for (index, pet) in pets.enumerated() {
+                print("   Pet \(index + 1): \(pet.name) (ID: \(pet.id))")
+            }
             #endif
 
             // Intentで選択されたペットを取得
             var selectedPet: Pet?
             if let selectedWidgetPet = configuration.selectedPet {
+                #if DEBUG
+                print("🔍 Widget: Looking for Intent selected pet: \(selectedWidgetPet.name) (ID: \(selectedWidgetPet.id))")
+                #endif
                 selectedPet = pets.first(where: { $0.id == selectedWidgetPet.id })
                 #if DEBUG
-                print("✅ Widget: Intent selected pet: \(selectedWidgetPet.name)")
+                if selectedPet != nil {
+                    print("✅ Widget: Intent selected pet FOUND: \(selectedWidgetPet.name)")
+                } else {
+                    print("❌ Widget: Intent selected pet NOT FOUND: \(selectedWidgetPet.name) (ID: \(selectedWidgetPet.id))")
+                    print("   Available pet IDs: \(pets.map { $0.id })")
+                }
+                #endif
+            } else {
+                #if DEBUG
+                print("⚠️ Widget: configuration.selectedPet is NIL")
                 #endif
             }
 
             // 選択されたペットがない場合は、設定で指定されたペットまたは最初のペット
             if selectedPet == nil {
+                #if DEBUG
+                print("🔄 Widget: Falling back to settings or first pet")
+                #endif
+
                 if let selectedID = settings.selectedPetID {
                     selectedPet = pets.first(where: { $0.id == selectedID })
+                    #if DEBUG
+                    if selectedPet != nil {
+                        print("✅ Widget: Found pet from settings: \(selectedPet!.name)")
+                    } else {
+                        print("⚠️ Widget: Pet from settings NOT found (ID: \(selectedID))")
+                    }
+                    #endif
                 }
                 if selectedPet == nil {
                     selectedPet = pets.first
+                    #if DEBUG
+                    if let pet = selectedPet {
+                        print("✅ Widget: Using first available pet: \(pet.name)")
+                    }
+                    #endif
                 }
             }
 

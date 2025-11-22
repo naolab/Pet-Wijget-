@@ -71,32 +71,10 @@ struct WidgetPreviewView: View {
 
     // MARK: - Small Widget
     private func smallWidgetContent(pet: Pet, displaySettings: DisplaySettings, themeSettings: ThemeSettings) -> some View {
-        VStack(spacing: 8) {
-            // ペット写真 (小さめ)
-            petPhotoView(photoData: pet.photoData, frameType: themeSettings.photoFrameType, size: 50)
-
-            // 現在時刻 (大きく表示)
-            if displaySettings.showTime {
-                Text(Date(), style: .time)
-                    .font(.system(size: CGFloat(displaySettings.timeFontSize), weight: .bold, design: displaySettings.timeDateFontDesign.design))
-                    .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor))
-            }
-
-            // ペット名 (コンパクト)
-            if displaySettings.showName {
-                HStack(spacing: 2) {
-                    Image(systemName: speciesIcon(pet.species))
-                        .font(.system(size: 8))
-                        .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.7))
-                    Text(pet.name)
-                        .font(.system(size: CGFloat(displaySettings.nameFontSize * 0.6), weight: .medium, design: displaySettings.textFontDesign.design))
-                        .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.7))
-                        .lineLimit(1)
-                }
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: displaySettings.textAlignment.alignment)
-        .padding(12)
+        // ペット写真のみを大きく表示
+        petPhotoView(photoData: pet.photoData, frameType: themeSettings.photoFrameType, size: 140)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .padding(8)
     }
 
     // MARK: - Medium Widget

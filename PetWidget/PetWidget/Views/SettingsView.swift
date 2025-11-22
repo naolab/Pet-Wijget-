@@ -35,6 +35,10 @@ struct SettingsView: View {
         }
         .navigationTitle("ウィジェット設定")
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            // ビューが表示されたときに選択されたペットを更新
+            viewModel.refreshSelectedPet()
+        }
         .alert("エラー", isPresented: .constant(viewModel.errorMessage != nil)) {
             Button("OK") {
                 viewModel.errorMessage = nil
@@ -60,9 +64,8 @@ struct SettingsView: View {
                 .padding(.horizontal)
 
                 // プレビュー表示
-                let selectedPet = viewModel.getSelectedPet()
                 WidgetPreviewView(
-                    pet: selectedPet,
+                    pet: viewModel.selectedPet,
                     settings: viewModel.widgetSettings,
                     widgetSize: selectedPreviewSize
                 )
