@@ -7,103 +7,132 @@ final class CoreDataStack {
     private(set) var persistentContainer: NSPersistentContainer?
     private(set) var initializationError: Error?
 
+    private var isSetup = false
+
     private init() {
-        do {
-            self.persistentContainer = try createPersistentContainer()
-        } catch {
-            self.initializationError = error
+        #if DEBUG
+        print("✅ CoreDataStack: Singleton initialized.")
+        #endif
+    }
+
+    func setup() throws {
+        guard !isSetup else {
             #if DEBUG
-            print("❌ CoreData: Initialization failed: \(error)")
+            print("ℹ️ CoreDataStack: Already set up.")
             #endif
+            return
+        }
+        
+        #if DEBUG
+        print("🔄 CoreDataStack: Starting setup...")
+        #endif
+
+        do {
+            persistentContainer = try createPersistentContainer()
+            isSetup = true
+            #if DEBUG
+            print("✅ CoreDataStack: Setup finished successfully.")
+            #endif
+        } catch {
+            initializationError = error
+            #if DEBUG
+            print("❌ CoreDataStack: Setup failed with error: \(error)")
+            #endif
+            throw error
         }
     }
 
-    private func loadCoreDataModel() -> (URL, NSManagedObjectModel)? {
-        // まずBundle.mainを試す
+    private func loadCoreDataModel() throws -> NSManagedObjectModel {
+        #if DEBUG
+        print("🔄 CoreDataStack: Loading Core Data model...")
+        #endif
+        
+        // CoreDataStackクラスが定義されているバンドルを優先的に探す
+        let bundle = Bundle(for: CoreDataStack.self)
+        if let url = bundle.url(forResource: "PetWidget", withExtension: "momd"),
+           let model = NSManagedObjectModel(contentsOf: url) {
+            #if DEBUG
+            print("✅ CoreDataStack: Model found in bundle: \(bundle.bundleIdentifier ?? "unknown")")
+            #endif
+            return model
+        }
+        
+        // フォールバック: メインバンドルを探す
         if let url = Bundle.main.url(forResource: "PetWidget", withExtension: "momd"),
            let model = NSManagedObjectModel(contentsOf: url) {
             #if DEBUG
-            print("✅ CoreData: Model found in main bundle")
+            print("✅ CoreDataStack: Model found in main bundle (fallback).")
             #endif
-            return (url, model)
+            return model
         }
 
-        // Widget Extensionなどで見つからない場合、全Bundleを検索
         #if DEBUG
-        print("⚠️ CoreData: Model not found in main bundle, searching all bundles...")
+        print("⚠️ CoreDataStack: Model not found in specific bundles, searching all bundles...")
         #endif
-
         for bundle in Bundle.allBundles {
             if let url = bundle.url(forResource: "PetWidget", withExtension: "momd"),
                let model = NSManagedObjectModel(contentsOf: url) {
                 #if DEBUG
-                print("✅ CoreData: Model found in bundle: \(bundle.bundleIdentifier ?? "unknown")")
+                print("✅ CoreDataStack: Model found in bundle: \(bundle.bundleIdentifier ?? "unknown")")
                 #endif
-                return (url, model)
+                return model
             }
         }
 
         #if DEBUG
-        print("❌ CoreData: Failed to load model file from any bundle")
-        Bundle.allBundles.forEach { bundle in
-            print("  - \(bundle.bundleIdentifier ?? "unknown"): \(bundle.bundlePath)")
-        }
+        print("❌ CoreDataStack: Failed to load model from any bundle.")
         #endif
-
-        return nil
+        throw PetWidgetError.coreDataError(NSError(
+            domain: "CoreDataStack", code: 1001,
+            userInfo: [NSLocalizedDescriptionKey: "CoreDataモデルファイルが見つかりません"]
+        ))
     }
 
     private func createPersistentContainer() throws -> NSPersistentContainer {
-        // モデルファイルの取得
-        guard let (modelURL, managedObjectModel) = loadCoreDataModel() else {
-            throw PetWidgetError.coreDataError(NSError(
-                domain: "CoreDataStack",
-                code: 1001,
-                userInfo: [NSLocalizedDescriptionKey: "CoreDataモデルファイルが見つかりません"]
-            ))
-        }
-
+        let managedObjectModel = try loadCoreDataModel()
         let container = NSPersistentContainer(name: "PetWidget", managedObjectModel: managedObjectModel)
 
-        // App Group Containerに保存
+        #if DEBUG
+        print("🔄 CoreDataStack: Getting App Group container URL...")
+        #endif
         guard let storeURL = FileManager.default.containerURL(
             forSecurityApplicationGroupIdentifier: AppConfig.appGroupID
         )?.appendingPathComponent("PetWidget.sqlite") else {
             #if DEBUG
-            print("❌ CoreData: App Group Container URL is nil!")
+            print("❌ CoreDataStack: App Group Container URL is nil for ID: \(AppConfig.appGroupID)")
             #endif
             throw PetWidgetError.coreDataError(NSError(
-                domain: "CoreDataStack",
-                code: 1002,
-                userInfo: [NSLocalizedDescriptionKey: "App Group Container (\(AppConfig.appGroupID)) にアクセスできません"]
+                domain: "CoreDataStack", code: 1002,
+                userInfo: [NSLocalizedDescriptionKey: "App Group Containerにアクセスできません"]
             ))
         }
-
         #if DEBUG
-        print("📦 CoreData: App Group ID = \(AppConfig.appGroupID)")
-        print("📦 CoreData: Store URL = \(storeURL.path)")
-        print("📦 CoreData: Model URL = \(modelURL.path)")
+        print("✅ CoreDataStack: Store URL is \(storeURL.path)")
         #endif
 
         let storeDescription = NSPersistentStoreDescription(url: storeURL)
+        storeDescription.setOption(true as NSNumber, forKey: NSPersistentHistoryTrackingKey)
         container.persistentStoreDescriptions = [storeDescription]
 
+        #if DEBUG
+        print("🔄 CoreDataStack: Loading persistent stores...")
+        #endif
         var loadError: Error?
         container.loadPersistentStores { description, error in
             if let error = error {
                 #if DEBUG
-                print("❌ CoreData: Failed to load store: \(error)")
+                print("❌ CoreDataStack: Failed to load persistent store: \(error)")
                 #endif
                 loadError = error
             } else {
                 #if DEBUG
-                print("✅ CoreData: Store loaded successfully at \(description.url?.path ?? "unknown")")
+                print("✅ CoreDataStack: Persistent store loaded successfully.")
                 #endif
             }
         }
 
         if let loadError = loadError {
-            throw PetWidgetError.coreDataError(loadError as NSError)
+            throw loadError
         }
 
         container.viewContext.automaticallyMergesChangesFromParent = true
@@ -114,14 +143,11 @@ final class CoreDataStack {
 
     var viewContext: NSManagedObjectContext {
         get throws {
-            if let error = initializationError {
-                throw error
-            }
+            if let error = initializationError { throw error }
             guard let container = persistentContainer else {
                 throw PetWidgetError.coreDataError(NSError(
-                    domain: "CoreDataStack",
-                    code: 1000,
-                    userInfo: [NSLocalizedDescriptionKey: "CoreDataが初期化されていません"]
+                    domain: "CoreDataStack", code: 1000,
+                    userInfo: [NSLocalizedDescriptionKey: "CoreDataが初期化されていません。setup()が呼ばれていません。"]
                 ))
             }
             return container.viewContext
