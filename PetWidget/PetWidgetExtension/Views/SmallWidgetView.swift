@@ -26,32 +26,37 @@ struct SmallWidgetView: View {
         let displaySettings = settings.displaySettings
         let themeSettings = settings.themeSettings
 
-        return VStack(spacing: 8) {
-            // ペット写真 (小さめ)
+        return ZStack {
+            // メインのペット写真を大きく中央に配置
             petPhotoView(photoData: pet.photoData, frameType: themeSettings.photoFrameType)
 
-            // 現在時刻 (大きく表示)
-            if displaySettings.showTime {
-                Text(entry.date, style: .time)
-                    .font(.system(size: CGFloat(displaySettings.timeFontSize), weight: .bold, design: .rounded))
-                    .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor))
-            }
+            // 下部に時刻とペット名を重ねて表示（表示設定による）
+            VStack {
+                Spacer()
 
-            // ペット名 (コンパクト)
-            if displaySettings.showName {
-                HStack(spacing: 2) {
-                    Image(systemName: speciesIcon(pet.species))
-                        .font(.system(size: 8))
-                        .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.7))
-                    Text(pet.name)
-                        .font(.system(size: CGFloat(displaySettings.nameFontSize * 0.6), weight: .medium))
-                        .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.7))
-                        .lineLimit(1)
+                VStack(spacing: 4) {
+                    // 現在時刻
+                    if displaySettings.showTime {
+                        Text(entry.date, style: .time)
+                            .font(.system(size: 18, weight: .bold, design: .rounded))
+                            .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor))
+                            .shadow(color: .black.opacity(0.3), radius: 2, x: 0, y: 1)
+                    }
+
+                    // ペット名
+                    if displaySettings.showName {
+                        Text(pet.name)
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.9))
+                            .shadow(color: .black.opacity(0.3), radius: 2, x: 0, y: 1)
+                            .lineLimit(1)
+                    }
                 }
+                .padding(.bottom, 8)
             }
         }
-        .frame(maxWidth: .infinity, alignment: displaySettings.textAlignment.alignment)
-        .padding(12)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(8)
     }
 
     private func backgroundView(themeSettings: ThemeSettings) -> some View {
@@ -78,31 +83,34 @@ struct SmallWidgetView: View {
         Group {
             if let photoData = photoData,
                let processedImage = processPhotoForWidget(photoData) {
+                // ウィジェット全体を覆うように画像を大きく表示
                 let image = Image(uiImage: processedImage)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
-                    .frame(width: 50, height: 50)
 
                 switch frameType {
                 case .circle:
                     image.clipShape(Circle())
-                        .overlay(Circle().stroke(Color.white.opacity(0.5), lineWidth: 2))
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 case .roundedRect:
-                    image.clipShape(RoundedRectangle(cornerRadius: 10))
-                        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.white.opacity(0.5), lineWidth: 2))
+                    image.clipShape(RoundedRectangle(cornerRadius: 20))
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 case .none:
                     image
+                        .clipShape(RoundedRectangle(cornerRadius: 20))
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             } else {
+                // プレースホルダー
                 ZStack {
                     Circle()
                         .fill(Color.gray.opacity(0.2))
-                        .frame(width: 50, height: 50)
 
                     Image(systemName: "pawprint.fill")
-                        .font(.system(size: 20))
+                        .font(.system(size: 50))
                         .foregroundColor(.gray)
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
     }

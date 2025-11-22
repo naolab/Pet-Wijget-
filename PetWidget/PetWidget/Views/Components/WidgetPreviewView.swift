@@ -71,32 +71,37 @@ struct WidgetPreviewView: View {
 
     // MARK: - Small Widget
     private func smallWidgetContent(pet: Pet, displaySettings: DisplaySettings, themeSettings: ThemeSettings) -> some View {
-        VStack(spacing: 8) {
-            // ペット写真 (小さめ)
-            petPhotoView(photoData: pet.photoData, frameType: themeSettings.photoFrameType, size: 50)
+        ZStack {
+            // メインのペット写真を大きく中央に配置
+            petPhotoView(photoData: pet.photoData, frameType: themeSettings.photoFrameType, size: 140)
 
-            // 現在時刻 (大きく表示)
-            if displaySettings.showTime {
-                Text(Date(), style: .time)
-                    .font(.system(size: CGFloat(displaySettings.timeFontSize), weight: .bold, design: displaySettings.timeDateFontDesign.design))
-                    .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor))
-            }
+            // 下部に時刻とペット名を重ねて表示
+            VStack {
+                Spacer()
 
-            // ペット名 (コンパクト)
-            if displaySettings.showName {
-                HStack(spacing: 2) {
-                    Image(systemName: speciesIcon(pet.species))
-                        .font(.system(size: 8))
-                        .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.7))
-                    Text(pet.name)
-                        .font(.system(size: CGFloat(displaySettings.nameFontSize * 0.6), weight: .medium, design: displaySettings.textFontDesign.design))
-                        .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.7))
-                        .lineLimit(1)
+                VStack(spacing: 4) {
+                    // 現在時刻
+                    if displaySettings.showTime {
+                        Text(Date(), style: .time)
+                            .font(.system(size: 18, weight: .bold, design: .rounded))
+                            .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor))
+                            .shadow(color: .black.opacity(0.3), radius: 2, x: 0, y: 1)
+                    }
+
+                    // ペット名
+                    if displaySettings.showName {
+                        Text(pet.name)
+                            .font(.system(size: 11, weight: .medium, design: displaySettings.textFontDesign.design))
+                            .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.9))
+                            .shadow(color: .black.opacity(0.3), radius: 2, x: 0, y: 1)
+                            .lineLimit(1)
+                    }
                 }
+                .padding(.bottom, 8)
             }
         }
-        .frame(maxWidth: .infinity, alignment: displaySettings.textAlignment.alignment)
-        .padding(12)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(8)
     }
 
     // MARK: - Medium Widget
