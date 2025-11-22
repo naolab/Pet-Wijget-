@@ -14,8 +14,8 @@ struct PetWidgetEntry: TimelineEntry {
 }
 
 struct PetWidgetTimelineProvider: TimelineProvider {
-    private let dataManager = PetDataManager.shared
-    private let settingsManager = SettingsManager.shared
+    private var dataManager: PetDataManager { PetDataManager.shared }
+    private var settingsManager: SettingsManager { SettingsManager.shared }
 
     func placeholder(in context: Context) -> PetWidgetEntry {
         let settings = loadSettings()
@@ -155,8 +155,8 @@ struct PetWidgetTimelineProvider: TimelineProvider {
 
 @available(iOS 16.0, *)
 struct PetWidgetIntentTimelineProvider: AppIntentTimelineProvider {
-    private let dataManager = PetDataManager.shared
-    private let settingsManager = SettingsManager.shared
+    private var dataManager: PetDataManager { PetDataManager.shared }
+    private var settingsManager: SettingsManager { SettingsManager.shared }
 
     func placeholder(in context: Context) -> PetWidgetEntry {
         let settings = loadSettings()
@@ -169,20 +169,22 @@ struct PetWidgetIntentTimelineProvider: AppIntentTimelineProvider {
     }
 
     func snapshot(for configuration: SelectPetIntent, in context: Context) async -> PetWidgetEntry {
-        if context.isPreview {
-            let settings = loadSettings()
-            return PetWidgetEntry(
-                date: Date(),
-                pet: createSamplePet(),
-                errorMessage: nil,
-                settings: settings
-            )
-        } else {
-            return await createEntry(for: Date(), with: configuration)
-        }
+        #if DEBUG
+        print("✅ [AppIntent] Widget: Creating a dummy snapshot.")
+        #endif
+        let dummyPet = createSamplePet()
+        let settings = loadSettings()
+        return PetWidgetEntry(date: Date(), pet: dummyPet, errorMessage: nil, settings: settings)
     }
 
     func timeline(for configuration: SelectPetIntent, in context: Context) async -> Timeline<PetWidgetEntry> {
+        if let userDefaults = UserDefaults(suiteName: AppConfig.appGroupID) {
+            let message = userDefaults.string(forKey: "group.test.message") ?? "NOT FOUND"
+            print("✅ Widget: Read from shared UserDefaults: \(message)")
+        } else {
+            print("❌ Widget: Failed to get shared UserDefaults.")
+        }
+
         var entries: [PetWidgetEntry] = []
 
         // 現在時刻から1時間先まで、1分ごとにエントリを生成

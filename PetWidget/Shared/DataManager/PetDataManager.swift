@@ -41,12 +41,29 @@ final class PetDataManager: PetDataManagerProtocol {
     }
 
     private init() {
+        #if DEBUG
+        print("✅ PetDataManager: Singleton initialized.")
+        #endif
         self.coreDataStack = CoreDataStack.shared
+        do {
+            try self.coreDataStack.setup()
+        } catch {
+            #if DEBUG
+            print("❌ PetDataManager: Failed to setup CoreDataStack during init. Error: \(error)")
+            #endif
+        }
+
         // App Group用のUserDefaultsを取得
         guard let userDefaults = UserDefaults(suiteName: AppConfig.appGroupID) else {
+            #if DEBUG
+            print("❌ PetDataManager: Failed to initialize UserDefaults with App Group ID. This will cause a crash.")
+            #endif
             fatalError("Failed to initialize UserDefaults with App Group ID: \(AppConfig.appGroupID)")
         }
         self.userDefaults = userDefaults
+        #if DEBUG
+        print("✅ PetDataManager: UserDefaults initialized successfully.")
+        #endif
     }
 
     func fetchAll(sortBy: PetSortOption = .displayOrder) throws -> [Pet] {
@@ -143,30 +160,36 @@ final class PetDataManager: PetDataManagerProtocol {
     private func mergeChanges() throws {
         let context = try coreDataStack.viewContext
         
-        try context.performAndWait {
-            let historyRequest = NSPersistentHistoryChangeRequest.fetchHistory(after: lastHistoryToken)
-            
-            guard let historyResult = try? context.execute(historyRequest) as? NSPersistentHistoryResult,
-                  let history = historyResult.history,
-                  !history.isEmpty else {
-                return
-            }
+        context.performAndWait {
+            do {
+                let historyRequest = NSPersistentHistoryChangeRequest.fetchHistory(after: lastHistoryToken)
+                
+                guard let historyResult = try context.execute(historyRequest) as? NSPersistentHistoryResult,
+                      let history = historyResult.result as? [NSPersistentHistoryTransaction],
+                      !history.isEmpty else {
+                    return
+                }
 
-            #if DEBUG
-            print("🔄 PetDataManager: Found \(history.count) new transaction(s) to merge.")
-            #endif
+                #if DEBUG
+                print("🔄 PetDataManager: Found \(history.count) new transaction(s) to merge.")
+                #endif
 
-            for transaction in history {
-                context.mergeChanges(fromContextDidSave: transaction.objectIDNotification())
-            }
+                for transaction in history {
+                    context.mergeChanges(fromContextDidSave: transaction.objectIDNotification())
+                }
 
-            if let lastToken = history.last?.token {
-                 if self.lastHistoryToken != lastToken {
-                     #if DEBUG
-                     print("✅ PetDataManager: Merged changes. New token saved.")
-                     #endif
-                     self.lastHistoryToken = lastToken
-                 }
+                if let lastToken = history.last?.token {
+                     if self.lastHistoryToken != lastToken {
+                         #if DEBUG
+                         print("✅ PetDataManager: Merged changes. New token saved.")
+                         #endif
+                         self.lastHistoryToken = lastToken
+                     }
+                }
+            } catch {
+                #if DEBUG
+                print("❌ PetDataManager: Failed to merge history: \(error)")
+                #endif
             }
         }
     }
