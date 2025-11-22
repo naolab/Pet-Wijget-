@@ -8,6 +8,7 @@ class SettingsViewModel: ObservableObject {
     @Published var widgetSettings: WidgetSettings
     @Published var errorMessage: String?
     @Published var isLoading = false
+    @Published var selectedPet: Pet?
 
     private let settingsManager = SettingsManager.shared
     private let petDataManager = PetDataManager.shared
@@ -20,6 +21,9 @@ class SettingsViewModel: ObservableObject {
             print("Failed to load settings: \(error)")
             self.widgetSettings = .default
         }
+
+        // 選択されたペットを読み込み
+        refreshSelectedPet()
     }
 
     // 設定を保存してウィジェットを更新
@@ -141,23 +145,29 @@ class SettingsViewModel: ObservableObject {
     // ペット選択
     func selectPet(_ petID: UUID?) {
         widgetSettings.selectedPetID = petID
+        refreshSelectedPet()
         saveSettings()
     }
 
-    // プレビュー用: 選択されたペットを取得
-    func getSelectedPet() -> Pet? {
+    // 選択されたペットを更新
+    func refreshSelectedPet() {
         do {
             if let selectedPetID = widgetSettings.selectedPetID {
                 // 特定のペットが選択されている場合
-                return try petDataManager.fetch(by: selectedPetID)
+                selectedPet = try petDataManager.fetch(by: selectedPetID)
             } else {
                 // 「最初のペット」が選択されている場合
                 let allPets = try petDataManager.fetchAll()
-                return allPets.first
+                selectedPet = allPets.first
             }
         } catch {
             errorMessage = "ペット情報の取得に失敗しました"
-            return nil
+            selectedPet = nil
         }
+    }
+
+    // プレビュー用: 選択されたペットを取得（後方互換性のため残す）
+    func getSelectedPet() -> Pet? {
+        return selectedPet
     }
 }
