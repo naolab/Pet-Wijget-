@@ -26,37 +26,10 @@ struct SmallWidgetView: View {
         let displaySettings = settings.displaySettings
         let themeSettings = settings.themeSettings
 
-        return ZStack {
-            // メインのペット写真を大きく中央に配置
-            petPhotoView(photoData: pet.photoData, frameType: themeSettings.photoFrameType)
-
-            // 下部に時刻とペット名を重ねて表示（表示設定による）
-            VStack {
-                Spacer()
-
-                VStack(spacing: 4) {
-                    // 現在時刻
-                    if displaySettings.showTime {
-                        Text(entry.date, style: .time)
-                            .font(.system(size: 18, weight: .bold, design: .rounded))
-                            .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor))
-                            .shadow(color: .black.opacity(0.3), radius: 2, x: 0, y: 1)
-                    }
-
-                    // ペット名
-                    if displaySettings.showName {
-                        Text(pet.name)
-                            .font(.system(size: 11, weight: .medium))
-                            .foregroundColor(ColorHelper.hexColor(themeSettings.fontColor).opacity(0.9))
-                            .shadow(color: .black.opacity(0.3), radius: 2, x: 0, y: 1)
-                            .lineLimit(1)
-                    }
-                }
-                .padding(.bottom, 8)
-            }
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .padding(8)
+        // ペット写真のみを大きく表示
+        return petPhotoView(photoData: pet.photoData, frameType: themeSettings.photoFrameType)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .padding(8)
     }
 
     private func backgroundView(themeSettings: ThemeSettings) -> some View {
