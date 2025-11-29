@@ -27,7 +27,7 @@ struct SmallWidgetView: View {
         let themeSettings = settings.themeSettings
 
         // ペット写真のみを大きく表示
-        return petPhotoView(photoData: pet.photoData, frameType: themeSettings.photoFrameType)
+        return petPhotoView(pet: pet, frameType: themeSettings.photoFrameType)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding(8)
     }
@@ -52,24 +52,23 @@ struct SmallWidgetView: View {
         }
     }
 
-    private func petPhotoView(photoData: Data?, frameType: PhotoFrameType) -> some View {
+    private func petPhotoView(pet: Pet, frameType: PhotoFrameType) -> some View {
         Group {
-            if let photoData = photoData,
-               let processedImage = processPhotoForWidget(photoData) {
+            if let image = resolveWidgetImage(for: pet) {
                 // ウィジェット全体を覆うように画像を大きく表示
-                let image = Image(uiImage: processedImage)
+                let viewImage = Image(uiImage: image)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
 
                 switch frameType {
                 case .circle:
-                    image.clipShape(Circle())
+                    viewImage.clipShape(Circle())
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 case .roundedRect:
-                    image.clipShape(RoundedRectangle(cornerRadius: 20))
+                    viewImage.clipShape(RoundedRectangle(cornerRadius: 20))
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 case .none:
-                    image
+                    viewImage
                         .clipShape(RoundedRectangle(cornerRadius: 20))
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
@@ -79,22 +78,30 @@ struct SmallWidgetView: View {
                     Circle()
                         .fill(Color.gray.opacity(0.2))
 
-                    Image(systemName: "pawprint.fill")
-                        .font(.system(size: 50))
-                        .foregroundColor(.gray)
+                    VStack(spacing: 4) {
+                        Image(systemName: "pawprint.fill")
+                            .font(.system(size: 30))
+                            .foregroundColor(.gray)
+                        Text("アプリを開いて\n更新")
+                            .font(.system(size: 8))
+                            .foregroundColor(.gray)
+                            .multilineTextAlignment(.center)
+                    }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
     }
 
-    private func processPhotoForWidget(_ photoData: Data) -> UIImage? {
-        guard let uiImage = UIImage(data: photoData),
-              let resizedData = PhotoManager.shared.processImageForWidget(uiImage),
-              let resizedImage = UIImage(data: resizedData) else {
-            return nil
+    private func resolveWidgetImage(for pet: Pet) -> UIImage? {
+        // 1. 軽量化されたウィジェット用データがあればそれを使用
+        if let widgetData = pet.widgetPhotoData, let image = UIImage(data: widgetData) {
+            return image
         }
-        return resizedImage
+        
+        // 2. フォールバック削除: ウィジェットでの重い画像処理はクラッシュの原因になるため行わない
+        // 代わりにnilを返し、プレースホルダーを表示させる（アプリを開いて移行を促す）
+        return nil
     }
 
     private var emptyStateView: some View {

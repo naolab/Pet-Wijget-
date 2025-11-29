@@ -1,5 +1,7 @@
 import CoreData
 import Foundation
+import UIKit
+import WidgetKit
 
 enum PetSortOption {
     case displayOrder   // カスタム並び順
@@ -15,6 +17,7 @@ protocol PetDataManagerProtocol {
     func update(_ pet: Pet) throws
     func delete(_ pet: Pet) throws
     func updateDisplayOrders(_ pets: [Pet]) throws
+    func migrateWidgetData()
 }
 
 final class PetDataManager: PetDataManagerProtocol {
@@ -109,6 +112,7 @@ final class PetDataManager: PetDataManagerProtocol {
         update(entity: entity, from: pet)
 
         try coreDataStack.saveContext()
+        WidgetCenter.shared.reloadAllTimelines()
     }
 
     func update(_ pet: Pet) throws {
@@ -123,6 +127,7 @@ final class PetDataManager: PetDataManagerProtocol {
 
         update(entity: entity, from: pet)
         try coreDataStack.saveContext()
+        WidgetCenter.shared.reloadAllTimelines()
     }
 
     func delete(_ pet: Pet) throws {
@@ -137,6 +142,7 @@ final class PetDataManager: PetDataManagerProtocol {
 
         context.delete(entity)
         try coreDataStack.saveContext()
+        WidgetCenter.shared.reloadAllTimelines()
     }
 
     func updateDisplayOrders(_ pets: [Pet]) throws {
@@ -153,6 +159,61 @@ final class PetDataManager: PetDataManagerProtocol {
         }
 
         try coreDataStack.saveContext()
+        WidgetCenter.shared.reloadAllTimelines()
+    }
+
+    func migrateWidgetData() {
+        print("🔄 PetDataManager: Starting widget data migration...")
+        do {
+            let context = try coreDataStack.viewContext
+            let request = NSFetchRequest<NSManagedObject>(entityName: "PetEntity")
+            let entities = try context.fetch(request)
+
+            print("📊 PetDataManager: Found \(entities.count) pets to check.")
+            var hasChanges = false
+            var successCount = 0
+            var failCount = 0
+            var skipCount = 0
+
+            for entity in entities {
+                let name = entity.value(forKey: "name") as? String ?? "Unknown"
+                
+                // 既にwidgetPhotoDataがある場合はスキップ
+                if entity.value(forKey: "widgetPhotoData") != nil {
+                    skipCount += 1
+                    continue
+                }
+                
+                // photoDataがない場合はスキップ
+                guard let photoData = entity.value(forKey: "photoData") as? Data else {
+                    print("⚠️ PetDataManager: Skipping \(name) - No original photo data.")
+                    skipCount += 1
+                    continue
+                }
+
+                // 画像生成を試みる
+                if let image = UIImage(data: photoData),
+                   let widgetData = PhotoManager.shared.processImageForWidget(image) {
+                    
+                    entity.setValue(widgetData, forKey: "widgetPhotoData")
+                    hasChanges = true
+                    successCount += 1
+                    print("✅ PetDataManager: Generated widget data for: \(name) (Size: \(widgetData.count) bytes)")
+                } else {
+                    failCount += 1
+                    print("❌ PetDataManager: Failed to process image for: \(name)")
+                }
+            }
+
+            if hasChanges {
+                try coreDataStack.saveContext()
+                print("✅ PetDataManager: Migration saved. Success: \(successCount), Failed: \(failCount), Skipped: \(skipCount)")
+            } else {
+                print("ℹ️ PetDataManager: No changes needed. Success: \(successCount), Failed: \(failCount), Skipped: \(skipCount)")
+            }
+        } catch {
+            print("❌ PetDataManager: Migration failed with error: \(error)")
+        }
     }
 
     // MARK: - Persistent History Tracking
@@ -207,6 +268,7 @@ final class PetDataManager: PetDataManagerProtocol {
         }
 
         let photoData = entity.value(forKey: "photoData") as? Data
+        let widgetPhotoData = entity.value(forKey: "widgetPhotoData") as? Data
         let originalPhotoData = entity.value(forKey: "originalPhotoData") as? Data
         let displayOrder = entity.value(forKey: "displayOrder") as? Int ?? 0
         let updatedAt = entity.value(forKey: "updatedAt") as? Date ?? createdAt
@@ -218,6 +280,7 @@ final class PetDataManager: PetDataManagerProtocol {
             birthDate: birthDate,
             species: species,
             photoData: photoData,
+            widgetPhotoData: widgetPhotoData,
             originalPhotoData: originalPhotoData,
             displayOrder: displayOrder,
             breed: breed
@@ -234,10 +297,17 @@ final class PetDataManager: PetDataManagerProtocol {
         entity.setValue(pet.birthDate, forKey: "birthDate")
         entity.setValue(pet.species.rawValue, forKey: "species")
         entity.setValue(pet.photoData, forKey: "photoData")
-        entity.setValue(pet.originalPhotoData, forKey: "originalPhotoData")
-        entity.setValue(pet.createdAt, forKey: "createdAt")
-        entity.setValue(Date(), forKey: "updatedAt")
         entity.setValue(pet.displayOrder, forKey: "displayOrder")
         entity.setValue(pet.breed, forKey: "breed")
+        
+        // widgetPhotoDataをphotoDataから自動生成して保存（常に同期させる）
+        if let photoData = pet.photoData,
+           let image = UIImage(data: photoData),
+           let widgetData = PhotoManager.shared.processImageForWidget(image) {
+            entity.setValue(widgetData, forKey: "widgetPhotoData")
+        } else {
+            // photoDataがない、または生成失敗した場合はnilにする
+            entity.setValue(nil, forKey: "widgetPhotoData")
+        }
     }
 }

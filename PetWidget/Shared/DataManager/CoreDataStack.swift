@@ -112,6 +112,10 @@ final class CoreDataStack {
 
         let storeDescription = NSPersistentStoreDescription(url: storeURL)
         storeDescription.setOption(true as NSNumber, forKey: NSPersistentHistoryTrackingKey)
+        
+        // App Groupでの共有のため、ファイル保護を解除（バックグラウンドやロック中のアクセスを許可）
+        storeDescription.setOption(FileProtectionType.none as NSObject, forKey: NSPersistentStoreFileProtectionKey)
+        
         container.persistentStoreDescriptions = [storeDescription]
 
         #if DEBUG

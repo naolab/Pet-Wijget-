@@ -28,7 +28,7 @@ struct MediumWidgetView: View {
 
         return HStack(spacing: 16) {
             // 左側: ペット写真
-            petPhotoView(photoData: pet.photoData, frameType: themeSettings.photoFrameType)
+            petPhotoView(pet: pet, frameType: themeSettings.photoFrameType)
 
             // 右側: 時刻・ペット情報
             VStack(alignment: displaySettings.textAlignment.horizontalAlignment, spacing: 8) {
@@ -105,22 +105,21 @@ struct MediumWidgetView: View {
         }
     }
 
-    private func petPhotoView(photoData: Data?, frameType: PhotoFrameType) -> some View {
+    private func petPhotoView(pet: Pet, frameType: PhotoFrameType) -> some View {
         Group {
-            if let photoData = photoData,
-               let processedImage = processPhotoForWidget(photoData) {
-                let image = Image(uiImage: processedImage)
+            if let image = resolveWidgetImage(for: pet) {
+                let viewImage = Image(uiImage: image)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 120, height: 120)
 
                 switch frameType {
                 case .circle:
-                    image.clipShape(Circle())
+                    viewImage.clipShape(Circle())
                 case .roundedRect:
-                    image.clipShape(RoundedRectangle(cornerRadius: 16))
+                    viewImage.clipShape(RoundedRectangle(cornerRadius: 16))
                 case .none:
-                    image
+                    viewImage
                 }
             } else {
                 ZStack {
@@ -128,21 +127,27 @@ struct MediumWidgetView: View {
                         .fill(Color.gray.opacity(0.2))
                         .frame(width: 120, height: 120)
 
-                    Image(systemName: "pawprint.fill")
-                        .font(.system(size: 50))
-                        .foregroundColor(.gray)
+                    VStack(spacing: 4) {
+                        Image(systemName: "pawprint.fill")
+                            .font(.system(size: 30))
+                            .foregroundColor(.gray)
+                        Text("アプリを開いて\n更新")
+                            .font(.system(size: 8))
+                            .foregroundColor(.gray)
+                            .multilineTextAlignment(.center)
+                    }
                 }
             }
         }
     }
 
-    private func processPhotoForWidget(_ photoData: Data) -> UIImage? {
-        guard let uiImage = UIImage(data: photoData),
-              let resizedData = PhotoManager.shared.processImageForWidget(uiImage),
-              let resizedImage = UIImage(data: resizedData) else {
-            return nil
+    private func resolveWidgetImage(for pet: Pet) -> UIImage? {
+        if let widgetData = pet.widgetPhotoData, let image = UIImage(data: widgetData) {
+            return image
         }
-        return resizedImage
+        
+        // フォールバック削除: ウィジェットでの重い画像処理はクラッシュの原因になるため行わない
+        return nil
     }
 
     private var emptyStateView: some View {

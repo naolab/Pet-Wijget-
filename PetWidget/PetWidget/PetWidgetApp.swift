@@ -7,6 +7,7 @@
 
 import SwiftUI
 import CoreData
+import WidgetKit
 
 @main
 struct PetWidgetApp: App {
@@ -15,6 +16,20 @@ struct PetWidgetApp: App {
     @State private var showSplash = true
 
     init() {
+        // App Group接続確認とファイル保護解除
+        if let containerURL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: AppConfig.appGroupID) {
+            print("📂 [Init] App Group URL: \(containerURL.path)")
+            
+            // データベースファイルの保護属性を強制的に解除（バックグラウンドアクセス用）
+            let fileNames = ["PetWidget.sqlite", "PetWidget.sqlite-wal", "PetWidget.sqlite-shm"]
+            for fileName in fileNames {
+                let fileURL = containerURL.appendingPathComponent(fileName)
+                if FileManager.default.fileExists(atPath: fileURL.path) {
+                    try? FileManager.default.setAttributes([.protectionKey: FileProtectionType.none], ofItemAtPath: fileURL.path)
+                }
+            }
+        }
+
         // CoreDataStackの初期化
         do {
             try coreDataStack.setup()
@@ -23,11 +38,12 @@ struct PetWidgetApp: App {
             print("❌ App: Failed to setup CoreDataStack: \(error)")
         }
 
+        // App Group接続確認（UserDefaults）
         if let userDefaults = UserDefaults(suiteName: AppConfig.appGroupID) {
+            print("✅ App: Successfully accessed shared UserDefaults.")
             userDefaults.set("Hello from App!", forKey: "group.test.message")
-            print("✅ App: Wrote 'Hello from App!' to shared UserDefaults for key 'group.test.message'.")
         } else {
-            print("❌ App: Failed to get shared UserDefaults.")
+            print("❌ App: Failed to access shared UserDefaults. App Group configuration might be wrong.")
         }
     }
 
@@ -53,6 +69,15 @@ struct PetWidgetApp: App {
                 } else if let viewContext = try? coreDataStack.viewContext {
                     MainTabView()
                         .environment(\.managedObjectContext, viewContext)
+                        .task {
+                            // Core Dataの準備が整ってから移行処理を実行
+                            print("🚀 App: View appeared, starting migration check...")
+                            PetDataManager.shared.migrateWidgetData()
+                            
+                            // ウィジェットの更新をリクエスト
+                            print("🔄 App: Requesting widget timeline reload...")
+                            WidgetCenter.shared.reloadAllTimelines()
+                        }
                 } else {
                     VStack(spacing: 20) {
                         ProgressView()
