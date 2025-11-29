@@ -163,53 +163,43 @@ final class PetDataManager: PetDataManagerProtocol {
     }
 
     func migrateWidgetData() {
-        print("🔄 PetDataManager: Starting widget data migration...")
         do {
             let context = try coreDataStack.viewContext
             let request = NSFetchRequest<NSManagedObject>(entityName: "PetEntity")
+            
+            // widgetPhotoDataが未設定で、かつphotoDataが存在するデータのみを取得
+            request.predicate = NSPredicate(format: "widgetPhotoData == nil AND photoData != nil")
+            
             let entities = try context.fetch(request)
+            
+            if entities.isEmpty {
+                return
+            }
 
-            print("📊 PetDataManager: Found \(entities.count) pets to check.")
+            print("🔄 PetDataManager: Found \(entities.count) pets needing widget data migration.")
             var hasChanges = false
             var successCount = 0
             var failCount = 0
-            var skipCount = 0
 
             for entity in entities {
                 let name = entity.value(forKey: "name") as? String ?? "Unknown"
                 
-                // 既にwidgetPhotoDataがある場合はスキップ
-                if entity.value(forKey: "widgetPhotoData") != nil {
-                    skipCount += 1
-                    continue
-                }
-                
-                // photoDataがない場合はスキップ
-                guard let photoData = entity.value(forKey: "photoData") as? Data else {
-                    print("⚠️ PetDataManager: Skipping \(name) - No original photo data.")
-                    skipCount += 1
+                guard let photoData = entity.value(forKey: "photoData") as? Data,
+                      let image = UIImage(data: photoData),
+                      let widgetData = PhotoManager.shared.processImageForWidget(image) else {
+                    failCount += 1
+                    print("❌ PetDataManager: Failed to process image for: \(name)")
                     continue
                 }
 
-                // 画像生成を試みる
-                if let image = UIImage(data: photoData),
-                   let widgetData = PhotoManager.shared.processImageForWidget(image) {
-                    
-                    entity.setValue(widgetData, forKey: "widgetPhotoData")
-                    hasChanges = true
-                    successCount += 1
-                    print("✅ PetDataManager: Generated widget data for: \(name) (Size: \(widgetData.count) bytes)")
-                } else {
-                    failCount += 1
-                    print("❌ PetDataManager: Failed to process image for: \(name)")
-                }
+                entity.setValue(widgetData, forKey: "widgetPhotoData")
+                hasChanges = true
+                successCount += 1
             }
 
             if hasChanges {
                 try coreDataStack.saveContext()
-                print("✅ PetDataManager: Migration saved. Success: \(successCount), Failed: \(failCount), Skipped: \(skipCount)")
-            } else {
-                print("ℹ️ PetDataManager: No changes needed. Success: \(successCount), Failed: \(failCount), Skipped: \(skipCount)")
+                print("✅ PetDataManager: Migration completed. Success: \(successCount), Failed: \(failCount)")
             }
         } catch {
             print("❌ PetDataManager: Migration failed with error: \(error)")

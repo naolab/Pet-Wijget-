@@ -17,18 +17,7 @@ struct PetWidgetApp: App {
 
     init() {
         // App Group接続確認とファイル保護解除
-        if let containerURL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: AppConfig.appGroupID) {
-            print("📂 [Init] App Group URL: \(containerURL.path)")
-            
-            // データベースファイルの保護属性を強制的に解除（バックグラウンドアクセス用）
-            let fileNames = ["PetWidget.sqlite", "PetWidget.sqlite-wal", "PetWidget.sqlite-shm"]
-            for fileName in fileNames {
-                let fileURL = containerURL.appendingPathComponent(fileName)
-                if FileManager.default.fileExists(atPath: fileURL.path) {
-                    try? FileManager.default.setAttributes([.protectionKey: FileProtectionType.none], ofItemAtPath: fileURL.path)
-                }
-            }
-        }
+        removeFileProtectionForAppGroup()
 
         // CoreDataStackの初期化
         do {
@@ -44,6 +33,24 @@ struct PetWidgetApp: App {
             userDefaults.set("Hello from App!", forKey: "group.test.message")
         } else {
             print("❌ App: Failed to access shared UserDefaults. App Group configuration might be wrong.")
+        }
+    }
+    
+    private func removeFileProtectionForAppGroup() {
+        guard let containerURL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: AppConfig.appGroupID) else {
+            print("❌ App: Failed to get App Group container URL.")
+            return
+        }
+        
+        print("📂 [Init] App Group URL: \(containerURL.path)")
+        
+        // データベースファイルの保護属性を強制的に解除（バックグラウンドアクセス用）
+        let fileNames = ["PetWidget.sqlite", "PetWidget.sqlite-wal", "PetWidget.sqlite-shm"]
+        for fileName in fileNames {
+            let fileURL = containerURL.appendingPathComponent(fileName)
+            if FileManager.default.fileExists(atPath: fileURL.path) {
+                try? FileManager.default.setAttributes([.protectionKey: FileProtectionType.none], ofItemAtPath: fileURL.path)
+            }
         }
     }
 
