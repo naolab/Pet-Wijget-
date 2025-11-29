@@ -42,8 +42,6 @@ struct PetWidgetApp: App {
             return
         }
         
-        print("📂 [Init] App Group URL: \(containerURL.path)")
-        
         // データベースファイルの保護属性を強制的に解除（バックグラウンドアクセス用）
         let fileNames = ["PetWidget.sqlite", "PetWidget.sqlite-wal", "PetWidget.sqlite-shm"]
         for fileName in fileNames {
@@ -78,11 +76,9 @@ struct PetWidgetApp: App {
                         .environment(\.managedObjectContext, viewContext)
                         .task {
                             // Core Dataの準備が整ってから移行処理を実行
-                            print("🚀 App: View appeared, starting migration check...")
                             PetDataManager.shared.migrateWidgetData()
                             
                             // ウィジェットの更新をリクエスト
-                            print("🔄 App: Requesting widget timeline reload...")
                             WidgetCenter.shared.reloadAllTimelines()
                         }
                 } else {

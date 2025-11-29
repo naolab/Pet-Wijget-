@@ -188,7 +188,9 @@ final class PetDataManager: PetDataManagerProtocol {
                       let image = UIImage(data: photoData),
                       let widgetData = PhotoManager.shared.processImageForWidget(image) else {
                     failCount += 1
+                    #if DEBUG
                     print("❌ PetDataManager: Failed to process image for: \(name)")
+                    #endif
                     continue
                 }
 
@@ -199,10 +201,14 @@ final class PetDataManager: PetDataManagerProtocol {
 
             if hasChanges {
                 try coreDataStack.saveContext()
+                #if DEBUG
                 print("✅ PetDataManager: Migration completed. Success: \(successCount), Failed: \(failCount)")
+                #endif
             }
         } catch {
+            #if DEBUG
             print("❌ PetDataManager: Migration failed with error: \(error)")
+            #endif
         }
     }
 
