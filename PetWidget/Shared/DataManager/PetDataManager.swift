@@ -293,6 +293,9 @@ final class PetDataManager: PetDataManagerProtocol {
         entity.setValue(pet.birthDate, forKey: "birthDate")
         entity.setValue(pet.species.rawValue, forKey: "species")
         entity.setValue(pet.photoData, forKey: "photoData")
+        entity.setValue(pet.originalPhotoData, forKey: "originalPhotoData")
+        entity.setValue(pet.createdAt, forKey: "createdAt")
+        entity.setValue(Date(), forKey: "updatedAt")
         entity.setValue(pet.displayOrder, forKey: "displayOrder")
         entity.setValue(pet.breed, forKey: "breed")
         
